@@ -298,7 +298,7 @@ export default function Home() {
             </div>
             <p className="text-slate-500 text-sm leading-relaxed max-w-xs mb-8">
               Helping the next generation of talent find their place in the
-              world's most innovative companies.
+              world&apos;s most innovative companies.
             </p>
             <div className="flex gap-4">
               <SocialIcon icon={<Globe size={18} />} />
