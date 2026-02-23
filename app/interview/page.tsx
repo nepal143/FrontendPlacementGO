@@ -15,6 +15,7 @@ import {
   Plus,
   HelpCircle,
 } from "lucide-react";
+import Navbar from "../component/Navbar";
 
 export default function InterviewStrategyGuide() {
   const [tasks, setTasks] = useState([
@@ -71,33 +72,7 @@ export default function InterviewStrategyGuide() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans selection:bg-blue-100">
       {/* --- HEADER NAVIGATION --- */}
-      <nav className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-10">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
-              <Target size={18} />
-            </div>
-            <span className="text-lg font-bold tracking-tight">CareerFlow</span>
-          </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-500">
-            <button className="hover:text-blue-600">Dashboard</button>
-            <button className="text-blue-600 border-b-2 border-blue-600 py-5">
-              Jobs
-            </button>
-            <button className="hover:text-blue-600">Interviews</button>
-            <button className="hover:text-blue-600">Resources</button>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-500">
-            <Zap size={20} />
-          </button>
-          <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-500">
-            <HelpCircle size={20} />
-          </button>
-          <div className="w-9 h-9 rounded-full bg-orange-100 border border-white shadow-sm" />
-        </div>
-      </nav>
+      <Navbar />
 
       <main className="max-w-7xl mx-auto p-8">
         {/* --- PAGE TITLE & TOP ACTIONS --- */}

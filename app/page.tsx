@@ -1,6 +1,8 @@
 "use client";
 
+
 import Link from "next/link";
+import Navbar from "./component/Navbar";
 import {
   CheckCircle,
   ArrowRight,
@@ -17,36 +19,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans">
       {/* --- NAVIGATION --- */}
-      <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xl">P</span>
-          </div>
-          <span className="text-xl font-bold tracking-tight">PlacementGo</span>
-        </div>
-        <div className="hidden md:flex gap-8 text-sm font-medium text-slate-600">
-          <Link href="#features" className="hover:text-blue-600 transition">
-            Features
-          </Link>
-          <Link href="#how-it-works" className="hover:text-blue-600 transition">
-            How it Works
-          </Link>
-          <Link href="#pricing" className="hover:text-blue-600 transition">
-            Pricing
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/login" className="text-sm font-semibold">
-            Login
-          </Link>
-          <Link
-            href="/signup"
-            className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
-          >
-            Start Free
-          </Link>
-        </div>
-      </nav>
+             
+      <Navbar />
 
       {/* --- HERO SECTION --- */}
       <header className="relative pt-16 pb-24 px-8 max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
@@ -69,7 +43,7 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
-              href="/upload"
+              href="/resumeoptimizer"
               className="flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition"
             >
               Start Your Journey Free <ArrowRight size={20} />
