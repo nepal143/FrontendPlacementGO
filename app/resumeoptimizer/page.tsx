@@ -10,7 +10,6 @@ export default function UploadResumePage() {
   const [pdfBase64, setPdfBase64] = useState<string | null>(null);
   const [latex, setLatex] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [dragOver, setDragOver] = useState(false);
 
   const uploadResume = async () => {
     if (!file) return alert("Please select a file");
@@ -53,553 +52,213 @@ export default function UploadResumePage() {
     link.click();
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const dropped = e.dataTransfer.files[0];
-    if (dropped) setFile(dropped);
-  };
-
   return (
-    <>
-      <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; }
+    <div className="min-h-screen bg-slate-100">
+      <div className="max-w-6xl mx-auto px-6 py-10">
 
-        .nav {
-          background: #1a1a2e;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 24px;
-          height: 56px;
-          position: sticky;
-          top: 0;
-          z-index: 100;
-        }
-        .nav-logo {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          color: #fff;
-          font-weight: 700;
-          font-size: 16px;
-        }
-        .nav-logo-icon {
-          width: 32px;
-          height: 32px;
-          background: #3b82f6;
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 16px;
-        }
-        .nav-links {
-          display: flex;
-          gap: 4px;
-        }
-        .nav-link {
-          color: #94a3b8;
-          text-decoration: none;
-          padding: 6px 14px;
-          border-radius: 6px;
-          font-size: 14px;
-          transition: color 0.15s;
-          cursor: pointer;
-          background: none;
-          border: none;
-        }
-        .nav-link:hover { color: #fff; }
-        .nav-link.active {
-          color: #fff;
-          border-bottom: 2px solid #3b82f6;
-          border-radius: 0;
-        }
-        .nav-right {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-        .btn-upgrade {
-          background: #3b82f6;
-          color: #fff;
-          border: none;
-          padding: 7px 16px;
-          border-radius: 6px;
-          font-size: 13px;
-          font-weight: 600;
-          cursor: pointer;
-        }
-        .avatar {
-          width: 34px;
-          height: 34px;
-          background: #e97316;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #fff;
-          font-weight: 700;
-          font-size: 14px;
-        }
-
-        .page {
-          max-width: 1100px;
-          margin: 0 auto;
-          padding: 36px 24px;
-        }
-
-        .page-header { margin-bottom: 28px; }
-        .page-title {
-          font-size: 26px;
-          font-weight: 700;
-          color: #0f172a;
-          margin-bottom: 6px;
-        }
-        .page-subtitle {
-          font-size: 14px;
-          color: #64748b;
-        }
-
-        .upload-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-          margin-bottom: 28px;
-        }
-
-        .card {
-          background: #fff;
-          border-radius: 12px;
-          border: 1px solid #e2e8f0;
-          padding: 24px;
-        }
-
-        .card-title {
-          font-size: 14px;
-          font-weight: 600;
-          color: #0f172a;
-          margin-bottom: 16px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .card-title-num {
-          width: 22px;
-          height: 22px;
-          background: #eff6ff;
-          border: 1px solid #bfdbfe;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 11px;
-          font-weight: 700;
-          color: #3b82f6;
-        }
-
-        .dropzone {
-          border: 2px dashed #cbd5e1;
-          border-radius: 10px;
-          padding: 48px 24px;
-          text-align: center;
-          cursor: pointer;
-          transition: all 0.15s;
-          background: #f8fafc;
-        }
-        .dropzone:hover, .dropzone.over {
-          border-color: #3b82f6;
-          background: #eff6ff;
-        }
-        .dropzone-icon {
-          font-size: 32px;
-          margin-bottom: 12px;
-          display: block;
-          color: #3b82f6;
-        }
-        .dropzone-text {
-          font-size: 14px;
-          color: #475569;
-          margin-bottom: 4px;
-          font-weight: 500;
-        }
-        .dropzone-subtext {
-          font-size: 12px;
-          color: #94a3b8;
-          margin-bottom: 16px;
-        }
-        .dropzone-file-name {
-          font-size: 13px;
-          color: #3b82f6;
-          font-weight: 500;
-          margin-top: 8px;
-        }
-        .btn-select {
-          background: #fff;
-          border: 1px solid #e2e8f0;
-          color: #374151;
-          padding: 8px 20px;
-          border-radius: 6px;
-          font-size: 13px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.15s;
-        }
-        .btn-select:hover { background: #f8fafc; border-color: #94a3b8; }
-
-        .jd-textarea {
-          width: 100%;
-          height: 168px;
-          border: 1.5px solid #e2e8f0;
-          border-radius: 8px;
-          padding: 14px;
-          font-size: 13.5px;
-          color: #374151;
-          resize: none;
-          outline: none;
-          transition: border-color 0.15s;
-          line-height: 1.5;
-          font-family: inherit;
-        }
-        .jd-textarea:focus { border-color: #3b82f6; }
-        .jd-textarea::placeholder { color: #94a3b8; }
-
-        .generate-row {
-          display: flex;
-          justify-content: center;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-          margin-bottom: 32px;
-        }
-
-        .btn-generate {
-          background: linear-gradient(135deg, #3b82f6, #2563eb);
-          color: #fff;
-          border: none;
-          padding: 14px 36px;
-          border-radius: 8px;
-          font-size: 15px;
-          font-weight: 600;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          transition: all 0.15s;
-          box-shadow: 0 4px 14px rgba(59,130,246,0.35);
-        }
-        .btn-generate:hover:not(:disabled) {
-          background: linear-gradient(135deg, #2563eb, #1d4ed8);
-          box-shadow: 0 6px 18px rgba(59,130,246,0.45);
-          transform: translateY(-1px);
-        }
-        .btn-generate:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-
-        .badges {
-          display: flex;
-          gap: 20px;
-          font-size: 12px;
-          color: #64748b;
-        }
-        .badge { display: flex; align-items: center; gap: 5px; }
-        .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
-
-        .error-msg { color: #ef4444; font-size: 13px; text-align: center; margin-top: 8px; }
-
-        /* Preview section */
-        .preview-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 16px;
-        }
-        .preview-title {
-          font-size: 16px;
-          font-weight: 700;
-          color: #0f172a;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .preview-title-icon { color: #22c55e; }
-
-        .ats-score-badge {
-          background: #f0fdf4;
-          border: 1px solid #bbf7d0;
-          color: #16a34a;
-          font-size: 13px;
-          font-weight: 700;
-          padding: 5px 14px;
-          border-radius: 20px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-        .ats-score-num { font-size: 18px; }
-
-        .btn-download {
-          background: #1a1a2e;
-          color: #fff;
-          border: none;
-          padding: 9px 18px;
-          border-radius: 7px;
-          font-size: 13px;
-          font-weight: 600;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          transition: all 0.15s;
-        }
-        .btn-download:hover { background: #2d2d4a; }
-
-        .preview-cols {
-          display: grid;
-          grid-template-columns: 1fr 1.4fr;
-          gap: 20px;
-        }
-
-        .preview-label {
-          font-size: 11px;
-          font-weight: 600;
-          color: #94a3b8;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          margin-bottom: 10px;
-        }
-
-        .resume-preview-original {
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 10px;
-          padding: 24px 20px;
-          min-height: 340px;
-          font-size: 8px;
-          color: #64748b;
-          position: relative;
-        }
-
-        .preview-iframe-wrap {
-          border-radius: 10px;
-          overflow: hidden;
-          border: 1px solid #e2e8f0;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-          position: relative;
-        }
-        .optimized-badge {
-          position: absolute;
-          bottom: 12px;
-          right: 12px;
-          background: #3b82f6;
-          color: #fff;
-          font-size: 10px;
-          font-weight: 700;
-          padding: 4px 10px;
-          border-radius: 4px;
-          letter-spacing: 0.05em;
-        }
-
-        .preview-footer {
-          background: #fff;
-          border: 1px solid #e2e8f0;
-          border-radius: 0 0 10px 10px;
-          padding: 10px 16px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          font-size: 12px;
-          color: #64748b;
-          margin-top: -1px;
-        }
-        .footer-kw { display: flex; align-items: center; gap: 6px; }
-        .footer-kw-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
-        .footer-edit { color: #3b82f6; cursor: pointer; font-weight: 500; }
-
-        .latex-details { margin-top: 20px; }
-        .latex-summary {
-          cursor: pointer;
-          font-weight: 600;
-          font-size: 13px;
-          color: #475569;
-          padding: 10px 0;
-        }
-        .latex-pre {
-          margin-top: 10px;
-          background: #f4f4f4;
-          padding: 20px;
-          border-radius: 8px;
-          overflow-x: auto;
-          font-size: 12px;
-          line-height: 1.6;
-        }
-
-        .spinner {
-          width: 16px;
-          height: 16px;
-          border: 2px solid rgba(255,255,255,0.4);
-          border-top-color: #fff;
-          border-radius: 50%;
-          animation: spin 0.6s linear infinite;
-          display: inline-block;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        @media (max-width: 700px) {
-          .upload-grid { grid-template-columns: 1fr; }
-          .preview-cols { grid-template-columns: 1fr; }
-        }
-      `}</style>
-
-      {/* NAV */}
-      <nav className="nav">
-        <div className="nav-logo">
-          <div className="nav-logo-icon">📄</div>
-          Resume Studio
-        </div>
-        <div className="nav-links">
-          <button className="nav-link">Dashboard</button>
-          <button className="nav-link active">Optimizer</button>
-          <button className="nav-link">Templates</button>
-          <button className="nav-link">Career Insights</button>
-        </div>
-        <div className="nav-right">
-          <button className="btn-upgrade">Upgrade Pro</button>
-          <div className="avatar">H</div>
-        </div>
-      </nav>
-
-      <div className="page">
         {/* HEADER */}
-        <div className="page-header">
-          <h1 className="page-title">Resume Optimizer</h1>
-          <p className="page-subtitle">Tailor your profile to specific job descriptions and beat the ATS filters instantly.</p>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-slate-900">Resume Optimizer</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Tailor your profile to specific job descriptions and beat the ATS filters instantly.
+          </p>
         </div>
 
-        {/* UPLOAD GRID */}
-        <div className="upload-grid">
+        {/* Upload Grid */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+
           {/* Upload Resume */}
-          <div className="card">
-            <div className="card-title">
-              <div className="card-title-num">1</div>
-              Upload Your Resume
+          <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-blue-500">
+                {/* File icon */}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+              </span>
+              <span className="font-semibold text-slate-900 text-sm">1. Upload Your Resume</span>
             </div>
-            <div
-              className={`dropzone${dragOver ? " over" : ""}`}
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={handleDrop}
-              onClick={() => document.getElementById("file-input")?.click()}
-            >
-              <span className="dropzone-icon">☁️</span>
-              <div className="dropzone-text">Click to browse or drag and drop</div>
-              <div className="dropzone-subtext">PDF, DOCX up to 10MB</div>
-              <button className="btn-select" onClick={(e) => { e.stopPropagation(); document.getElementById("file-input")?.click(); }}>
-                Select File
-              </button>
-              {file && <div className="dropzone-file-name">✓ {file.name}</div>}
-            </div>
-            <input
-              id="file-input"
-              type="file"
-              accept=".pdf,.docx"
-              style={{ display: "none" }}
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-            />
+
+            {/* Drag & Drop Zone */}
+            <label className="block border-2 border-dashed border-slate-200 rounded-xl p-10 text-center cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-colors group">
+              <input
+                type="file"
+                accept=".pdf,.docx"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                className="hidden"
+              />
+              <div className="flex flex-col items-center gap-3">
+                {/* Upload cloud icon */}
+                <div className="w-12 h-12 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="16 16 12 12 8 16"/>
+                    <line x1="12" y1="12" x2="12" y2="21"/>
+                    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-700">
+                    Click to browse or drag and drop
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">PDF, DOCX up to 10MB</p>
+                </div>
+                <button
+                  type="button"
+                  className="mt-1 px-4 py-1.5 border border-slate-300 rounded-md text-xs font-medium text-slate-600 bg-white hover:bg-slate-50 transition"
+                  onClick={(e) => e.preventDefault()}
+                >
+                  Select File
+                </button>
+              </div>
+            </label>
+
+            {file && (
+              <p className="text-sm text-blue-600 mt-3">✓ {file.name}</p>
+            )}
           </div>
 
-          {/* Paste Job Description */}
-          <div className="card">
-            <div className="card-title">
-              <div className="card-title-num">2</div>
-              Paste Job Description
+          {/* Job Description */}
+          <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-blue-500">
+                {/* Clipboard icon */}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                </svg>
+              </span>
+              <span className="font-semibold text-slate-900 text-sm">2. Paste Job Description</span>
             </div>
+
             <textarea
-              className="jd-textarea"
-              placeholder="Paste the full job requirements here to identify missing keywords and skills..."
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
+              placeholder="Paste the full job requirements here to identify missing keywords and skills..."
+              className="w-full h-[calc(100%-3rem)] min-h-[200px] border border-slate-200 rounded-lg p-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
             />
           </div>
         </div>
 
-        {/* GENERATE BUTTON */}
-        <div className="generate-row">
-          <button className="btn-generate" onClick={uploadResume} disabled={loading}>
-            {loading ? (
-              <><span className="spinner" /> Generating Resume...</>
-            ) : (
-              <><span>✨</span> Generate Optimized Resume</>
-            )}
+        {/* Generate Button */}
+        <div className="flex flex-col items-center gap-3 mb-12">
+          <button
+            onClick={uploadResume}
+            disabled={loading}
+            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md transition disabled:opacity-70 flex items-center gap-2 text-sm"
+          >
+            {/* Sparkle / wand icon */}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8L19 13M17.8 6.2L19 5M3 21l9-9M12.2 6.2L11 5"/>
+            </svg>
+            {loading ? "Generating Resume..." : "Generate Optimized Resume"}
           </button>
-          <div className="badges">
-            <span className="badge"><span className="badge-dot" /> AI-Powered Analysis</span>
-            <span className="badge"><span className="badge-dot" /> ATS Score Optimization</span>
+
+          <div className="flex items-center gap-6 text-xs text-slate-400">
+            <span className="flex items-center gap-1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              AI-Powered Analysis
+            </span>
+            <span className="flex items-center gap-1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              ATS Score Optimization
+            </span>
           </div>
-          {error && <div className="error-msg">{error}</div>}
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
         </div>
 
-        {/* PREVIEW */}
+        {/* Preview Section */}
         {pdfBase64 && (
           <div>
-            <div className="preview-header">
-              <div className="preview-title">
-                <span className="preview-title-icon">✅</span>
+            {/* Preview Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2 font-semibold text-base text-slate-900">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
                 Optimization Preview
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div className="ats-score-badge">
-                  ATS SCORE <span className="ats-score-num">94%</span>
+
+              <div className="flex items-center gap-3">
+                <div className="bg-green-50 border border-green-200 text-green-600 font-bold text-sm px-4 py-1.5 rounded-full flex items-center gap-1.5">
+                  ATS SCORE <span className="text-green-700 text-base font-extrabold">94%</span>
                 </div>
-                <button className="btn-download" onClick={downloadPdf}>
-                  ⬇ Download PDF
+
+                <button
+                  onClick={downloadPdf}
+                  className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  Download PDF
                 </button>
               </div>
             </div>
 
-            <div className="preview-cols">
+            {/* Two Column Layout */}
+            <div className="grid md:grid-cols-2 gap-6">
+
               {/* Original */}
               <div>
-                <div className="preview-label">Original Version</div>
-                <div className="resume-preview-original">
-                  <div style={{ fontSize: 11, color: "#94a3b8", textAlign: "center", paddingTop: 80 }}>
-                    Original resume preview
-                  </div>
+                <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-3">
+                  Original Version
+                </div>
+
+                <div className="bg-slate-50 border border-slate-200 rounded-xl h-[600px] flex items-center justify-center text-slate-400 text-sm">
+                  Original resume preview
                 </div>
               </div>
 
               {/* Optimized */}
               <div>
-                <div className="preview-label">Optimized Version (ATS-Ready)</div>
-                <div className="preview-iframe-wrap">
-                  <iframe
-                    src={`data:application/pdf;base64,${pdfBase64}`}
-                    width="100%"
-                    height="520px"
-                    style={{ display: "block", border: "none" }}
-                  />
-                  <div className="optimized-badge">OPTIMIZED BY AI</div>
+                <div className="text-xs uppercase tracking-wider text-blue-600 font-semibold mb-3">
+                  Optimized Version (ATS-Ready)
                 </div>
-                <div className="preview-footer">
-                  <div className="footer-kw">
-                    <span className="footer-kw-dot" />
+
+                <div className="relative bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
+                  <iframe
+                    src={`data:application/pdf;base64,${pdfBase64}#toolbar=0&navpanes=0&scrollbar=0`}
+                    className="w-full h-[600px]"
+                  />
+                  <div className="absolute bottom-4 right-4 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded">
+                    OPTIMIZED BY AI
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
                     ATS Keywords Found (12)
                   </div>
-                  <span>⊙ Format: Standard Harvard</span>
-                  <span className="footer-edit">Edit Formatting</span>
+                  <div className="flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                    Format: Standard Harvard
+                  </div>
+                  <button className="text-blue-600 hover:underline">Edit Formatting</button>
                 </div>
               </div>
             </div>
 
+            {/* LaTeX Source */}
             {latex && (
-              <details className="latex-details">
-                <summary className="latex-summary">Show LaTeX Source</summary>
-                <pre className="latex-pre">{latex}</pre>
+              <details className="mt-8">
+                <summary className="cursor-pointer font-semibold text-sm text-slate-700">
+                  Show LaTeX Source
+                </summary>
+                <pre className="mt-4 bg-slate-200 p-4 rounded-md text-xs overflow-x-auto">
+                  {latex}
+                </pre>
               </details>
             )}
           </div>
         )}
+
       </div>
-    </>
+    </div>
   );
 }

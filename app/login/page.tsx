@@ -33,338 +33,144 @@ export default function LoginPage() {
   };
 
   return (
-    <>
-      <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-
-        .page {
-          min-height: 100vh;
-          background: #f0f2f5;
-          display: flex;
-          flex-direction: column;
-        }
-
-        /* NAV */
-        .nav {
-          background: #1a1a2e;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 24px;
-          height: 56px;
-        }
-        .nav-logo {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          color: #fff;
-          font-weight: 700;
-          font-size: 16px;
-          text-decoration: none;
-        }
-        .nav-logo-icon {
-          width: 32px;
-          height: 32px;
-          background: #3b82f6;
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 16px;
-        }
-        .nav-links {
-          display: flex;
-          gap: 4px;
-        }
-        .nav-link {
-          color: #94a3b8;
-          text-decoration: none;
-          padding: 6px 14px;
-          border-radius: 6px;
-          font-size: 14px;
-          cursor: pointer;
-          background: none;
-          border: none;
-          transition: color 0.15s;
-        }
-        .nav-link:hover { color: #fff; }
-
-        /* MAIN */
-        .main {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 40px 24px;
-        }
-
-        .card {
-          background: #fff;
-          border-radius: 16px;
-          border: 1px solid #e2e8f0;
-          padding: 44px 40px;
-          width: 100%;
-          max-width: 420px;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.07);
-        }
-
-        .card-logo {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 28px;
-        }
-        .card-logo-inner {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          color: #0f172a;
-          font-weight: 700;
-          font-size: 18px;
-        }
-        .card-logo-icon {
-          width: 38px;
-          height: 38px;
-          background: #3b82f6;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 18px;
-        }
-
-        .card-title {
-          font-size: 22px;
-          font-weight: 700;
-          color: #0f172a;
-          text-align: center;
-          margin-bottom: 6px;
-        }
-        .card-subtitle {
-          font-size: 14px;
-          color: #64748b;
-          text-align: center;
-          margin-bottom: 32px;
-        }
-
-        .form-group { margin-bottom: 18px; }
-        .form-label {
-          display: block;
-          font-size: 13px;
-          font-weight: 600;
-          color: #374151;
-          margin-bottom: 6px;
-        }
-        .form-input {
-          width: 100%;
-          padding: 10px 14px;
-          border: 1.5px solid #e2e8f0;
-          border-radius: 8px;
-          font-size: 14px;
-          color: #0f172a;
-          outline: none;
-          transition: border-color 0.15s;
-          font-family: inherit;
-          background: #f8fafc;
-        }
-        .form-input:focus {
-          border-color: #3b82f6;
-          background: #fff;
-        }
-        .form-input::placeholder { color: #94a3b8; }
-
-        .forgot {
-          display: flex;
-          justify-content: flex-end;
-          margin-top: -10px;
-          margin-bottom: 18px;
-        }
-        .forgot-link {
-          font-size: 12px;
-          color: #3b82f6;
-          cursor: pointer;
-          text-decoration: none;
-          font-weight: 500;
-        }
-        .forgot-link:hover { text-decoration: underline; }
-
-        .btn-login {
-          width: 100%;
-          background: linear-gradient(135deg, #3b82f6, #2563eb);
-          color: #fff;
-          border: none;
-          padding: 12px;
-          border-radius: 8px;
-          font-size: 15px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.15s;
-          box-shadow: 0 4px 14px rgba(59,130,246,0.35);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-        }
-        .btn-login:hover:not(:disabled) {
-          background: linear-gradient(135deg, #2563eb, #1d4ed8);
-          box-shadow: 0 6px 18px rgba(59,130,246,0.45);
-          transform: translateY(-1px);
-        }
-        .btn-login:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-
-        .error-msg {
-          color: #ef4444;
-          font-size: 13px;
-          text-align: center;
-          margin-top: 14px;
-          background: #fef2f2;
-          border: 1px solid #fecaca;
-          border-radius: 6px;
-          padding: 8px 12px;
-        }
-
-        .divider {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin: 22px 0;
-          color: #94a3b8;
-          font-size: 12px;
-        }
-        .divider-line {
-          flex: 1;
-          height: 1px;
-          background: #e2e8f0;
-        }
-
-        .signup-row {
-          text-align: center;
-          font-size: 13px;
-          color: #64748b;
-          margin-top: 20px;
-        }
-        .signup-link {
-          color: #3b82f6;
-          font-weight: 600;
-          cursor: pointer;
-          text-decoration: none;
-        }
-        .signup-link:hover { text-decoration: underline; }
-
-        .spinner {
-          width: 15px;
-          height: 15px;
-          border: 2px solid rgba(255,255,255,0.4);
-          border-top-color: #fff;
-          border-radius: 50%;
-          animation: spin 0.6s linear infinite;
-          display: inline-block;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .badge-row {
-          display: flex;
-          justify-content: center;
-          gap: 16px;
-          margin-top: 24px;
-        }
-        .badge {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          font-size: 11.5px;
-          color: #64748b;
-        }
-        .badge-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: #22c55e;
-        }
-      `}</style>
-
-      <div className="page">
-        {/* NAV */}
-        <nav className="nav">
-          <div className="nav-logo">
-            <div className="nav-logo-icon">📄</div>
-            Resume Studio
+    <div className="min-h-screen flex flex-col bg-gray-100 font-sans">
+      
+      {/* NAV */}
+      <nav className="bg-[#1a1a2e] flex items-center justify-between px-6 h-14">
+        <div className="flex items-center gap-2.5 text-white font-bold text-sm">
+          <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center text-base">
+            📄
           </div>
-          <div className="nav-links">
-            <button className="nav-link">Dashboard</button>
-            <button className="nav-link">Optimizer</button>
-            <button className="nav-link">Templates</button>
-            <button className="nav-link">Career Insights</button>
-          </div>
-          <div style={{ width: 120 }} />
-        </nav>
+          Resume Studio
+        </div>
 
-        {/* MAIN */}
-        <div className="main">
-          <div className="card">
-            <div className="card-logo">
-              <div className="card-logo-inner">
-                <div className="card-logo-icon">📄</div>
-                Resume Studio
-              </div>
-            </div>
-
-            <h1 className="card-title">Welcome back</h1>
-            <p className="card-subtitle">Sign in to your account to continue</p>
-
-            <div className="form-group">
-              <label className="form-label">Email address</label>
-              <input
-                className="form-input"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && login()}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Password</label>
-              <input
-                className="form-input"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && login()}
-              />
-            </div>
-
-            <div className="forgot">
-              <a className="forgot-link" href="#">Forgot password?</a>
-            </div>
-
-            <button className="btn-login" onClick={login} disabled={loading}>
-              {loading ? <><span className="spinner" /> Signing in...</> : "Sign In"}
+        <div className="flex gap-1">
+          {["Dashboard", "Optimizer", "Templates", "Career Insights"].map((item) => (
+            <button
+              key={item}
+              className="text-slate-400 hover:text-white px-3.5 py-1.5 rounded-md text-sm transition-colors"
+            >
+              {item}
             </button>
+          ))}
+        </div>
 
-            {error && <div className="error-msg">⚠ {error}</div>}
+        <div className="w-[120px]" />
+      </nav>
 
-            <div className="divider">
-              <div className="divider-line" />
-              <span>or</span>
-              <div className="divider-line" />
+      {/* MAIN */}
+      <div className="flex-1 flex items-center justify-center px-6 py-10">
+        <div className="bg-white border border-gray-200 rounded-2xl p-11 w-full max-w-md shadow-[0_8px_32px_rgba(0,0,0,0.07)]">
+
+          {/* Logo */}
+          <div className="flex justify-center mb-7">
+            <div className="flex items-center gap-2.5 text-slate-900 font-bold text-lg">
+              <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center text-lg">
+                📄
+              </div>
+              Resume Studio
             </div>
+          </div>
 
-            <div className="signup-row">
-              Don't have an account?{" "}
-              <a className="signup-link" href="/register">Create one free</a>
-            </div>
+          <h1 className="text-2xl font-bold text-slate-900 text-center mb-1">
+            Welcome back
+          </h1>
+          <p className="text-sm text-slate-500 text-center mb-8">
+            Sign in to your account to continue
+          </p>
 
-            <div className="badge-row">
-              <span className="badge"><span className="badge-dot" /> AI-Powered</span>
-              <span className="badge"><span className="badge-dot" /> ATS Optimized</span>
-              <span className="badge"><span className="badge-dot" /> Secure</span>
+          {/* Email */}
+          <div className="mb-4">
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+              Email address
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && login()}
+              className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:border-blue-500 outline-none transition"
+            />
+          </div>
+
+          {/* Password */}
+          <div className="mb-4">
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && login()}
+              className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:border-blue-500 outline-none transition"
+            />
+          </div>
+
+          {/* Forgot */}
+          <div className="flex justify-end -mt-2 mb-4">
+            <a
+              href="#"
+              className="text-xs text-blue-500 hover:underline font-medium"
+            >
+              Forgot password?
+            </a>
+          </div>
+
+          {/* Button */}
+          <button
+            onClick={login}
+            disabled={loading}
+            className="w-full bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:opacity-70 disabled:cursor-not-allowed text-white py-3 rounded-lg text-sm font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
+                Signing in...
+              </>
+            ) : (
+              "Sign In"
+            )}
+          </button>
+
+          {/* Error */}
+          {error && (
+            <div className="mt-3 text-sm text-red-500 text-center bg-red-50 border border-red-200 rounded-md py-2 px-3">
+              ⚠ {error}
             </div>
+          )}
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-5 text-xs text-slate-400">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span>or</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+
+          {/* Signup */}
+          <div className="text-center text-xs text-slate-500 mt-4">
+            Don't have an account?{" "}
+            <a
+              href="/register"
+              className="text-blue-500 font-semibold hover:underline"
+            >
+              Create one free
+            </a>
+          </div>
+
+          {/* Badges */}
+          <div className="flex justify-center gap-4 mt-6">
+            {["AI-Powered", "ATS Optimized", "Secure"].map((badge) => (
+              <span key={badge} className="flex items-center gap-1 text-xs text-slate-500">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                {badge}
+              </span>
+            ))}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
