@@ -9,22 +9,23 @@ interface CreateReferralResponse {
   shareLink: string;
   linkedinSearchLink: string;
   templates: Record<string, string>;
+  company?: string;
+  role?: string;
 }
 
-const mockJobData = {
-  company: "Google",
-  role: "Senior Frontend Engineer",
-  location: "Mountain View, CA",
-  type: "Full-time",
-  mode: "Hybrid",
-  skills: ["React", "TypeScript", "GraphQL", "Tailwind CSS"],
-  image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=200&q=80",
-};
+interface ReferralDetails {
+  referralId: string;
+  company: string;
+  role: string;
+  jobDescription: string;
+  shareLink: string;
+  linkedinSearchLink: string;
+  templates: Record<string, string>;
+}
 
 const API_BASE_URL = "http://localhost:8080";
 
 // IMPORTANT: Replace with actual user ID from your auth system
-// For now using a dummy UUID - backend requires userId header
 const USER_ID = "550e8400-e29b-41d4-a716-446655440000";
 
 export default function ReferralFinder() {
@@ -34,15 +35,8 @@ export default function ReferralFinder() {
   const [copied, setCopied] = useState<string | null>(null);
   
   // State for API data
-  const [currentReferral, setCurrentReferral] = useState<CreateReferralResponse | null>(null);
-  const [templates, setTemplates] = useState<Record<string, string>>({});
+  const [currentReferral, setCurrentReferral] = useState<ReferralDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
-  // Job details extracted from backend response
-  const [jobDetails, setJobDetails] = useState<{
-    company: string;
-    role: string;
-  } | null>(null);
 
   const handleAnalyze = async () => {
     if (!jobDescription.trim()) {
@@ -52,8 +46,19 @@ export default function ReferralFinder() {
 
     setAnalyzing(true);
     setError(null);
+    setDetected(false);
 
     try {
+      // Get token from localStorage
+      const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+     console.log(token);
+
+      if (!token) {
+        setError("Authentication required. Please log in again.");
+        setAnalyzing(false);
+        return;
+      }
+
       // Step 1: Create referral request
       const requestBody = {
         jobDescription: jobDescription.trim()
@@ -63,7 +68,8 @@ export default function ReferralFinder() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "userId": USER_ID
+          "userId": USER_ID,
+          "Authorization": `Bearer ${token}` 
         },
         body: JSON.stringify(requestBody)
       });
@@ -75,47 +81,46 @@ export default function ReferralFinder() {
 
       const data: CreateReferralResponse = await response.json();
       
-      // Backend returns templates as object with SHORT, PROFESSIONAL, CASUAL keys
-      setCurrentReferral(data);
-      setTemplates(data.templates || {});
-      setDetected(true);
-
-      // Note: Backend will extract company and role from job description
-      // These will be available in the full referral object if we fetch it by ID
+      console.log("API Response:", data); // Debug ke liye
+      
+      // Step 2: Fetch full referral details by ID
+      await fetchReferralById(data.referralId, token);
       
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to analyze job. Please try again.");
       console.error("Error creating referral:", err);
+      setDetected(false);
     } finally {
       setAnalyzing(false);
     }
   };
 
-  const fetchReferralById = async (referralId: string) => {
+  const fetchReferralById = async (referralId: string, token: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/referrals/${referralId}`);
+      const response = await fetch(`${API_BASE_URL}/api/referrals/${referralId}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "userId": USER_ID
+        }
+      });
       
       if (!response.ok) {
         console.warn("Failed to fetch referral details");
+        setError("Failed to fetch complete referral details");
         return;
       }
 
-      const data = await response.json();
+      const data: ReferralDetails = await response.json();
       
-      // Update with full referral data including extracted company/role
-      if (data.company && data.role) {
-        setJobDetails({
-          company: data.company,
-          role: data.role
-        });
-      }
+      console.log("Referral Details:", data); // Debug ke liye
       
-      // Update templates if available
-      if (data.templates) {
-        setTemplates(data.templates);
-      }
+      // Set complete referral data
+      setCurrentReferral(data);
+      setDetected(true);
+      
     } catch (err) {
       console.error("Error fetching referral details:", err);
+      setError("Failed to load referral details");
     }
   };
 
@@ -127,20 +132,22 @@ export default function ReferralFinder() {
 
   const handleLinkedInSearch = () => {
     if (currentReferral?.linkedinSearchLink) {
-      // Opens LinkedIn search for employees at the company
       window.open(currentReferral.linkedinSearchLink, "_blank");
     }
   };
 
-  // Get template values - backend returns SHORT, PROFESSIONAL, CASUAL
-  const shortTemplate = templates["SHORT"] || templates["short"] || 
-    `Hi [Name],\n\nI saw you're at ${jobDetails?.company || 'the company'}. I'm applying for ${jobDetails?.role || 'a role'} and would love to connect!\n\nBest,\n[Your Name]`;
+  // Get template values from backend
+  const shortTemplate = currentReferral?.templates?.["SHORT"] || 
+    currentReferral?.templates?.["short"] || 
+    `Hi [Name],\n\nI saw you're at ${currentReferral?.company || '[Company]'}. I'm applying for ${currentReferral?.role || '[Role]'} and would love to connect!\n\nBest,\n[Your Name]`;
 
-  const professionalTemplate = templates["PROFESSIONAL"] || templates["professional"] || 
-    `Hello [Name],\n\nI noticed you work at ${jobDetails?.company || 'the company'} and wanted to reach out regarding the ${jobDetails?.role || 'position'} I'm applying for.\n\nI'd appreciate any insights you could share about the team and role.\n\nThank you,\n[Your Name]`;
+  const professionalTemplate = currentReferral?.templates?.["PROFESSIONAL"] || 
+    currentReferral?.templates?.["professional"] || 
+    `Hello [Name],\n\nI noticed you work at ${currentReferral?.company || '[Company]'} and wanted to reach out regarding the ${currentReferral?.role || '[Position]'} I'm applying for.\n\nI'd appreciate any insights you could share about the team and role.\n\nThank you,\n[Your Name]`;
 
-  const casualTemplate = templates["CASUAL"] || templates["casual"] || 
-    `Hey [Name]!\n\nI'm applying for ${jobDetails?.role || 'a role'} at ${jobDetails?.company || 'your company'} and would love to chat about your experience there.\n\nWould you be open to a quick coffee chat?\n\nCheers,\n[Your Name]`;
+  const casualTemplate = currentReferral?.templates?.["CASUAL"] || 
+    currentReferral?.templates?.["casual"] || 
+    `Hey [Name]!\n\nI'm applying for ${currentReferral?.role || '[Role]'} at ${currentReferral?.company || '[Company]'} and would love to chat about your experience there.\n\nWould you be open to a quick coffee chat?\n\nCheers,\n[Your Name]`;
 
   return (
     <div style={{ fontFamily: "'DM Sans', 'Segoe UI', sans-serif", minHeight: "100vh", background: "#f5f6fa" }}>
@@ -251,8 +258,8 @@ export default function ReferralFinder() {
           }}>
             <div style={{ display: "flex", gap: 18, alignItems: "flex-start" }}>
               <img
-                src={mockJobData.image}
-                alt="Company office"
+                src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=200&q=80"
+                alt="Company"
                 style={{ width: 100, height: 72, borderRadius: 10, objectFit: "cover", flexShrink: 0 }}
               />
               <div style={{ flex: 1 }}>
@@ -269,20 +276,10 @@ export default function ReferralFinder() {
                   Company & Role
                 </div>
                 <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#1a1d2e", letterSpacing: "-0.3px" }}>
-                  {mockJobData.company} — {mockJobData.role}
+                  {currentReferral.company || "Company"} — {currentReferral.role || "Role"}
                 </h2>
-                <div style={{ color: "#6b7280", fontSize: 13.5, marginTop: 4, display: "flex", alignItems: "center", gap: 6 }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="#9ca3af" strokeWidth="2"/><circle cx="12" cy="10" r="3" stroke="#9ca3af" strokeWidth="2"/></svg>
-                  {mockJobData.location} • {mockJobData.type} • {mockJobData.mode}
-                </div>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 10 }}>
-                  {mockJobData.skills.map(skill => (
-                    <span key={skill} style={{
-                      background: "#f3f4f6", color: "#374151",
-                      fontSize: 12, fontWeight: 500, padding: "4px 10px",
-                      borderRadius: 6, border: "1px solid #e5e7eb"
-                    }}>{skill}</span>
-                  ))}
+                <div style={{ color: "#6b7280", fontSize: 13.5, marginTop: 8 }}>
+                  Job description analyzed successfully
                 </div>
               </div>
             </div>
@@ -309,11 +306,7 @@ export default function ReferralFinder() {
               </button>
               {currentReferral.shareLink && (
                 <button 
-                  onClick={() => {
-                    navigator.clipboard.writeText(currentReferral.shareLink);
-                    setCopied("shareLink");
-                    setTimeout(() => setCopied(null), 2000);
-                  }}
+                  onClick={() => handleCopy("shareLink", currentReferral.shareLink)}
                   style={{
                     background: copied === "shareLink" ? "#ecfdf5" : "#f9fafb",
                     border: `1.5px solid ${copied === "shareLink" ? "#6ee7b7" : "#e5e7eb"}`,
