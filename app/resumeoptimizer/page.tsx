@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../component/Navbar";
 
 export default function UploadResumePage() {
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
+
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
   const [template, setTemplate] = useState("classic");
@@ -12,6 +17,15 @@ export default function UploadResumePage() {
   const [pdfBase64, setPdfBase64] = useState<string | null>(null);
   const [latex, setLatex] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [originalPdfUrl, setOriginalPdfUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+
+  useEffect(() => {
+    if (!isLoggedIn) router.push("/login");
+  }, [isLoggedIn]);
+
+  if (!isLoggedIn) return null;
 
   const uploadResume = async () => {
     if (!file) return alert("Please select a file");
@@ -55,13 +69,38 @@ export default function UploadResumePage() {
     link.click();
   };
 
+  const handleSelectFileClick = () => {
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const dropped = e.dataTransfer.files[0];
+      setFile(dropped);
+      if (originalPdfUrl) URL.revokeObjectURL(originalPdfUrl);
+      setOriginalPdfUrl(URL.createObjectURL(dropped));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-100">
       <div className="bg-white border-b border-slate-200">
         <Navbar />
       </div>
       <div className="max-w-6xl mx-auto px-6 py-10">
-
         {/* HEADER */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-slate-900">Resume Optimizer</h1>
@@ -69,10 +108,8 @@ export default function UploadResumePage() {
             Tailor your profile to specific job descriptions and beat the ATS filters instantly.
           </p>
         </div>
-
         {/* Upload Grid */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
-
           {/* Upload Resume */}
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -85,13 +122,23 @@ export default function UploadResumePage() {
               </span>
               <span className="font-semibold text-slate-900 text-sm">1. Upload Your Resume</span>
             </div>
-
             {/* Drag & Drop Zone */}
-            <label className="block border-2 border-dashed border-slate-200 rounded-xl p-10 text-center cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-colors group">
+            <label
+              className={`block border-2 border-dashed border-slate-200 rounded-xl p-10 text-center cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-colors group ${dragActive ? "border-blue-500 bg-blue-100" : ""}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
               <input
+                ref={fileInputRef}
                 type="file"
                 accept=".pdf,.docx"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                onChange={(e) => {
+                  const f = e.target.files?.[0] || null;
+                  setFile(f);
+                  if (originalPdfUrl) URL.revokeObjectURL(originalPdfUrl);
+                  setOriginalPdfUrl(f ? URL.createObjectURL(f) : null);
+                }}
                 className="hidden"
               />
               <div className="flex flex-col items-center gap-3">
@@ -112,10 +159,19 @@ export default function UploadResumePage() {
                 <button
                   type="button"
                   className="mt-1 px-4 py-1.5 border border-slate-300 rounded-md text-xs font-medium text-slate-600 bg-white hover:bg-slate-50 transition"
-                  onClick={(e) => e.preventDefault()}
+                  onClick={handleSelectFileClick}
                 >
                   Select File
                 </button>
+                {file && (
+                  <div className="mt-4 flex items-center justify-center bg-green-50 border border-green-200 rounded-lg px-4 py-2 gap-2 animate-fade-in">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span className="text-green-700 font-semibold text-sm">{file.name}</span>
+                    <span className="text-green-600 text-xs font-medium">Uploaded!</span>
+                  </div>
+                )}
               </div>
             </label>
 
@@ -157,7 +213,7 @@ export default function UploadResumePage() {
             </span>
             <span className="font-semibold text-slate-900 text-sm">3. Choose a Template</span>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-5 gap-4">
             {/* Classic */}
             <button
               type="button"
@@ -224,6 +280,50 @@ export default function UploadResumePage() {
               <p className="font-semibold text-slate-800 text-sm">Compact</p>
               <p className="text-xs text-slate-500 mt-0.5">Dense layout, more content per page</p>
               {template === "compact" && <span className="text-xs text-blue-600 font-semibold mt-1 block">✓ Selected</span>}
+            </button>
+
+            {/* Elegant */}
+            <button
+              type="button"
+              onClick={() => setTemplate("elegant")}
+              className={`rounded-xl border-2 p-4 text-left transition-all ${template === "elegant" ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-blue-300"}`}
+            >
+              <div className="w-full h-28 bg-white border border-slate-200 rounded-lg mb-3 flex flex-col gap-1 p-2 overflow-hidden">
+                <div className="h-2 bg-teal-600 rounded w-1/2 mx-auto" />
+                <div className="h-px bg-teal-400 mt-1" />
+                <div className="h-1.5 bg-teal-600 rounded w-3/4 mt-1" style={{fontVariant: "small-caps"}} />
+                <div className="h-1 bg-slate-200 rounded w-full" />
+                <div className="h-1 bg-slate-200 rounded w-5/6" />
+                <div className="h-px bg-teal-300 mt-1" />
+                <div className="h-1.5 bg-teal-500 rounded w-2/3 mt-1" />
+                <div className="h-1 bg-slate-200 rounded w-full" />
+                <div className="h-1 bg-slate-200 rounded w-4/6" />
+              </div>
+              <p className="font-semibold text-slate-800 text-sm">Elegant</p>
+              <p className="text-xs text-slate-500 mt-0.5">Teal accents, small-caps sections</p>
+              {template === "elegant" && <span className="text-xs text-blue-600 font-semibold mt-1 block">✓ Selected</span>}
+            </button>
+
+            {/* Sharp */}
+            <button
+              type="button"
+              onClick={() => setTemplate("sharp")}
+              className={`rounded-xl border-2 p-4 text-left transition-all ${template === "sharp" ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-blue-300"}`}
+            >
+              <div className="w-full h-28 bg-white border border-slate-200 rounded-lg mb-3 flex flex-col gap-1 p-2 overflow-hidden">
+                <div className="h-2 bg-indigo-800 rounded w-1/2 mx-auto" />
+                <div className="h-0.5 bg-indigo-700 mt-1" />
+                <div className="h-1.5 bg-indigo-700 rounded w-3/4 mt-1 uppercase" />
+                <div className="h-1 bg-slate-200 rounded w-full" />
+                <div className="h-1 bg-slate-200 rounded w-5/6" />
+                <div className="h-0.5 bg-indigo-700 mt-1" />
+                <div className="h-1.5 bg-indigo-700 rounded w-2/3 mt-1" />
+                <div className="h-1 bg-slate-200 rounded w-full" />
+                <div className="h-1 bg-slate-200 rounded w-4/6" />
+              </div>
+              <p className="font-semibold text-slate-800 text-sm">Sharp</p>
+              <p className="text-xs text-slate-500 mt-0.5">Bold navy, uppercase headers</p>
+              {template === "sharp" && <span className="text-xs text-blue-600 font-semibold mt-1 block">✓ Selected</span>}
             </button>
           </div>
         </div>
@@ -296,9 +396,19 @@ export default function UploadResumePage() {
                   Original Version
                 </div>
 
-                <div className="bg-slate-50 border border-slate-200 rounded-xl h-[600px] flex items-center justify-center text-slate-400 text-sm">
-                  Original resume preview
-                </div>
+                {originalPdfUrl ? (
+                  <div className="relative bg-white border border-slate-200 rounded-xl shadow overflow-hidden">
+                    <iframe
+                      src={`${originalPdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                      className="w-full h-[600px]"
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl h-[600px] flex flex-col items-center justify-center text-slate-400 text-sm gap-2">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>Upload your resume above to preview it here</span>
+                  </div>
+                )}
               </div>
 
               {/* Optimized */}

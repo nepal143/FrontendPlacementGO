@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../component/Navbar";
 import {
   Search,
@@ -17,7 +19,15 @@ import {
 } from "lucide-react";
 
 export default function ApplicationsTracker() {
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("All Statuses");
+
+  useEffect(() => {
+    if (!isLoggedIn) router.push("/login");
+  }, [isLoggedIn]);
+
+  if (!isLoggedIn) return null;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans selection:bg-blue-100">
@@ -38,7 +48,6 @@ export default function ApplicationsTracker() {
               one centralized dashboard.
             </p>
           </div>
-
           <div className="flex items-center gap-3">
             <div className="bg-white border border-slate-200 rounded-2xl p-4 flex gap-8 shadow-sm">
               <div>

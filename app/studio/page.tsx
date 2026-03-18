@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../component/Navbar";
 import {
   Upload,
@@ -16,7 +18,15 @@ import {
 } from "lucide-react";
 
 export default function ResumeStudio() {
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
   const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    if (!isLoggedIn) router.push("/login");
+  }, [isLoggedIn]);
+
+  if (!isLoggedIn) return null;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans">

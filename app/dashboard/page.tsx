@@ -18,6 +18,7 @@ interface ApiApplication {
   appliedDate?: string;
   status: BackendStatus;
   createdAt: string;
+  updatedAt?: string;
 }
 
 const STATUS_MAP: Record<BackendStatus, StatusType> = {
@@ -25,6 +26,13 @@ const STATUS_MAP: Record<BackendStatus, StatusType> = {
   INTERVIEW: "interviewing",
   REJECTED: "rejected",
   OFFER: "offer",
+};
+
+const REVERSE_STATUS_MAP: Record<StatusType, BackendStatus> = {
+  applied: "APPLIED",
+  interviewing: "INTERVIEW",
+  rejected: "REJECTED",
+  offer: "OFFER",
 };
 
 const LOGO_COLORS = [
@@ -61,6 +69,8 @@ function mapApiApp(app: ApiApplication): Application {
     position: app.role,
     status: STATUS_MAP[app.status] || "applied",
     activity: timeAgo(app.createdAt),
+    jobLink: app.jobLink,
+    appliedDate: app.appliedDate,
   };
 }
 
@@ -72,10 +82,11 @@ interface Application {
   position: string;
   status: StatusType;
   activity: string;
+  jobLink?: string;
+  appliedDate?: string;
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-// (Applications are loaded from the backend API)
 
 const FILTERS: { label: string; value: FilterType }[] = [
   { label: "All", value: "all" },
@@ -118,7 +129,6 @@ const StatusPill = ({ status }: { status: StatusType }) => {
     </span>
   );
 };
-
 
 const NavItem = ({
   icon,
@@ -187,7 +197,7 @@ const StatCard = ({
   );
 };
 
-// ─── Icons (inline SVGs as components) ───────────────────────────────────────
+// ─── Icons ────────────────────────────────────────────────────────────────────
 
 const SearchIcon = () => (
   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -198,12 +208,6 @@ const SearchIcon = () => (
 const BellIcon = () => (
   <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-  </svg>
-);
-
-const HelpIcon = () => (
-  <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
 
@@ -222,12 +226,6 @@ const DocIcon = () => (
 const UsersIcon = () => (
   <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0" />
-  </svg>
-);
-
-const ClipboardIcon = () => (
-  <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
   </svg>
 );
 
@@ -262,13 +260,25 @@ const CheckIcon = () => (
   </svg>
 );
 
-// ─── Main Dashboard Component ─────────────────────────────────────────────────
-
 const PlusIcon = () => (
   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
   </svg>
 );
+
+const TrashIcon = () => (
+  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+  </svg>
+);
+
+// ─── Main Dashboard Component ─────────────────────────────────────────────────
 
 export default function Dashboard() {
   const router = useRouter();
@@ -276,13 +286,35 @@ export default function Dashboard() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  
+  // Add Application Modal
   const [showAddModal, setShowAddModal] = useState(false);
   const [addForm, setAddForm] = useState({ company: "", role: "", jobLink: "", appliedDate: "" });
   const [addLoading, setAddLoading] = useState(false);
   const [addError, setAddError] = useState("");
 
+  // Edit Application Modal
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingApp, setEditingApp] = useState<Application | null>(null);
+  const [editForm, setEditForm] = useState({ company: "", role: "", jobLink: "", appliedDate: "" });
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  // Status Update Modal
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusApp, setStatusApp] = useState<Application | null>(null);
+  const [newStatus, setNewStatus] = useState<StatusType>("applied");
+  const [statusLoading, setStatusLoading] = useState(false);
+
+  // Delete Confirmation Modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingApp, setDeletingApp] = useState<Application | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   const userInitials = userEmail ? userEmail.slice(0, 2).toUpperCase() : "U";
   const greeting = userEmail ? userEmail.split("@")[0] : "there";
+
+  const API_BASE_URL = "http://localhost:8080";
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -292,17 +324,37 @@ export default function Dashboard() {
     fetchApplications();
   }, [isLoggedIn]);
 
+  // ─── API Functions ────────────────────────────────────────────────────────
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    return {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+  };
+
   const fetchApplications = async () => {
+    setLoadingData(true);
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/applications", {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await fetch(`${API_BASE_URL}/applications`, {
+        headers: getAuthHeaders(),
       });
-      if (!res.ok) throw new Error("Failed to fetch");
+      
+      if (!res.ok) {
+        if (res.status === 401) {
+          logout();
+          router.push("/login");
+          return;
+        }
+        throw new Error("Failed to fetch applications");
+      }
+      
       const data: ApiApplication[] = await res.json();
       setApplications(data.map(mapApiApp));
     } catch (e) {
       console.error("Failed to load applications:", e);
+      setAddError("Failed to load applications. Please try again.");
     } finally {
       setLoadingData(false);
     }
@@ -313,31 +365,166 @@ export default function Dashboard() {
       setAddError("Company and role are required.");
       return;
     }
+    
     setAddLoading(true);
     setAddError("");
+    
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/applications", {
+      const res = await fetch(`${API_BASE_URL}/applications`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
-          company: addForm.company,
-          role: addForm.role,
-          jobLink: addForm.jobLink || null,
+          company: addForm.company.trim(),
+          role: addForm.role.trim(),
+          jobLink: addForm.jobLink.trim() || null,
           appliedDate: addForm.appliedDate || null,
         }),
       });
-      if (!res.ok) throw new Error("Failed to add");
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to add application");
+      }
+      
       const newApp: ApiApplication = await res.json();
       setApplications(prev => [mapApiApp(newApp), ...prev]);
       setAddForm({ company: "", role: "", jobLink: "", appliedDate: "" });
       setShowAddModal(false);
     } catch (e: any) {
-      setAddError(e.message);
+      setAddError(e.message || "Failed to add application");
     } finally {
       setAddLoading(false);
     }
   };
+
+  const updateApplication = async () => {
+    if (!editingApp || !editForm.company.trim() || !editForm.role.trim()) {
+      setEditError("Company and role are required.");
+      return;
+    }
+    
+    setEditLoading(true);
+    setEditError("");
+    
+    try {
+      const res = await fetch(`${API_BASE_URL}/applications/${editingApp.id}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          company: editForm.company.trim(),
+          role: editForm.role.trim(),
+          jobLink: editForm.jobLink.trim() || null,
+          appliedDate: editForm.appliedDate || null,
+        }),
+      });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to update application");
+      }
+      
+      const updated: ApiApplication = await res.json();
+      setApplications(prev => prev.map(app => 
+        app.id === editingApp.id ? mapApiApp(updated) : app
+      ));
+      setShowEditModal(false);
+      setEditingApp(null);
+    } catch (e: any) {
+      setEditError(e.message || "Failed to update application");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const updateStatus = async () => {
+    if (!statusApp) return;
+    
+    setStatusLoading(true);
+    
+    try {
+      const res = await fetch(`${API_BASE_URL}/applications/${statusApp.id}/status`, {
+        method: "PATCH",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          status: REVERSE_STATUS_MAP[newStatus],
+        }),
+      });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to update status");
+      }
+      
+      const updated: ApiApplication = await res.json();
+      setApplications(prev => prev.map(app => 
+        app.id === statusApp.id ? mapApiApp(updated) : app
+      ));
+      setShowStatusModal(false);
+      setStatusApp(null);
+    } catch (e: any) {
+      console.error("Failed to update status:", e);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
+  const deleteApplication = async () => {
+    if (!deletingApp) return;
+    
+    setDeleteLoading(true);
+    
+    try {
+      const res = await fetch(`${API_BASE_URL}/applications/${deletingApp.id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      
+      if (!res.ok) {
+        throw new Error("Failed to delete application");
+      }
+      
+      setApplications(prev => prev.filter(app => app.id !== deletingApp.id));
+      setShowDeleteModal(false);
+      setDeletingApp(null);
+    } catch (e: any) {
+      console.error("Failed to delete application:", e);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  // ─── Event Handlers ───────────────────────────────────────────────────────
+
+  const handleEdit = (app: Application) => {
+    setEditingApp(app);
+    setEditForm({
+      company: app.company,
+      role: app.position,
+      jobLink: app.jobLink || "",
+      appliedDate: app.appliedDate || "",
+    });
+    setEditError("");
+    setShowEditModal(true);
+  };
+
+  const handleStatusChange = (app: Application) => {
+    setStatusApp(app);
+    setNewStatus(app.status);
+    setShowStatusModal(true);
+  };
+
+  const handleDelete = (app: Application) => {
+    setDeletingApp(app);
+    setShowDeleteModal(true);
+  };
+
+  const handleRowClick = (app: Application, e: React.MouseEvent) => {
+    // Don't trigger if clicking on action buttons
+    if ((e.target as HTMLElement).closest('button')) return;
+    handleStatusChange(app);
+  };
+
+  // ─── Computed Values ──────────────────────────────────────────────────────
 
   const filtered = activeFilter === "all"
     ? applications
@@ -360,7 +547,6 @@ export default function Dashboard() {
         display: "flex", flexDirection: "column", padding: "24px 0",
         position: "fixed", height: "100vh", zIndex: 10,
       }}>
-        {/* Logo */}
         <Link href="/" style={{ textDecoration: "none" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 20px 28px", borderBottom: "1px solid #e8ecf4" }}>
             <div style={{
@@ -372,7 +558,6 @@ export default function Dashboard() {
           </div>
         </Link>
 
-        {/* Nav */}
         <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: "#7b8299", padding: "20px 20px 8px" }}>Menu</span>
         <NavItem icon={<DashboardIcon />} label="Dashboard" href="/dashboard" active />
         <NavItem icon={<DocIcon />} label="Resume Optimizer" href="/resumeoptimizer" />
@@ -382,7 +567,6 @@ export default function Dashboard() {
         <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: "#7b8299", padding: "20px 20px 8px" }}>Account</span>
         <NavItem icon={<SettingsIcon />} label="Settings" href="/settings" />
 
-        {/* User + Logout */}
         <div style={{ marginTop: "auto", padding: 16, borderTop: "1px solid #e8ecf4" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 10, borderRadius: 10 }}>
             <div style={{
@@ -548,7 +732,7 @@ export default function Dashboard() {
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr style={{ background: "#fafbfd", borderBottom: "1px solid #e8ecf4" }}>
-                        {["Company", "Position", "Status", "Added"].map(h => (
+                        {["Company", "Position", "Status", "Added", "Actions"].map(h => (
                           <th key={h} style={{ textAlign: "left", fontSize: 11, fontWeight: 700, letterSpacing: "0.8px", textTransform: "uppercase", color: "#7b8299", padding: "10px 20px" }}>
                             {h}
                           </th>
@@ -557,7 +741,17 @@ export default function Dashboard() {
                     </thead>
                     <tbody>
                       {filtered.map((app, i) => (
-                        <tr key={app.id} style={{ borderBottom: i < filtered.length - 1 ? "1px solid #e8ecf4" : "none", cursor: "pointer" }}>
+                        <tr 
+                          key={app.id} 
+                          onClick={(e) => handleRowClick(app, e)}
+                          style={{ 
+                            borderBottom: i < filtered.length - 1 ? "1px solid #e8ecf4" : "none", 
+                            cursor: "pointer",
+                            transition: "background 0.15s",
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = "#fafbfd"}
+                          onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                        >
                           <td style={{ padding: "14px 20px" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                               <div style={{
@@ -571,6 +765,32 @@ export default function Dashboard() {
                           <td style={{ padding: "14px 20px", fontSize: 13 }}>{app.position}</td>
                           <td style={{ padding: "14px 20px" }}><StatusPill status={app.status} /></td>
                           <td style={{ padding: "14px 20px", fontSize: 12, color: "#7b8299" }}>{app.activity}</td>
+                          <td style={{ padding: "14px 20px" }}>
+                            <div style={{ display: "flex", gap: 8 }}>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleEdit(app); }}
+                                style={{
+                                  padding: "6px 10px", borderRadius: 6, border: "1px solid #e8ecf4",
+                                  background: "white", cursor: "pointer", display: "flex", alignItems: "center",
+                                  gap: 4, fontSize: 12, fontWeight: 500, color: "#3b5bdb", fontFamily: "inherit",
+                                }}
+                                title="Edit"
+                              >
+                                <EditIcon />
+                              </button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleDelete(app); }}
+                                style={{
+                                  padding: "6px 10px", borderRadius: 6, border: "1px solid #e8ecf4",
+                                  background: "white", cursor: "pointer", display: "flex", alignItems: "center",
+                                  gap: 4, fontSize: 12, fontWeight: 500, color: "#e03131", fontFamily: "inherit",
+                                }}
+                                title="Delete"
+                              >
+                                <TrashIcon />
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -687,6 +907,177 @@ export default function Dashboard() {
                 style={{ flex: 2, padding: "11px 0", background: "#3b5bdb", color: "white", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", opacity: addLoading ? 0.7 : 1 }}
               >
                 {addLoading ? "Saving..." : "Save Application"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── EDIT APPLICATION MODAL ── */}
+      {showEditModal && editingApp && (
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) { setShowEditModal(false); setEditError(""); } }}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
+            display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100,
+          }}
+        >
+          <div style={{
+            background: "white", borderRadius: 16, padding: 28, width: 440, maxWidth: "90vw",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+          }}>
+            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 20 }}>Edit Application</div>
+
+            {editError && (
+              <div style={{ background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#c92a2a", marginBottom: 16 }}>
+                {editError}
+              </div>
+            )}
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {[
+                { label: "Company *", key: "company", placeholder: "e.g. Google", type: "text" },
+                { label: "Role *", key: "role", placeholder: "e.g. Software Engineer Intern", type: "text" },
+                { label: "Job Link", key: "jobLink", placeholder: "https://...", type: "url" },
+                { label: "Applied Date", key: "appliedDate", placeholder: "", type: "date" },
+              ].map(field => (
+                <div key={field.key}>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#4a4f6b", marginBottom: 6 }}>{field.label}</label>
+                  <input
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    value={(editForm as Record<string, string>)[field.key]}
+                    onChange={e => setEditForm(prev => ({ ...prev, [field.key]: e.target.value }))}
+                    style={{
+                      width: "100%", padding: "10px 14px", fontSize: 13, border: "1.5px solid #e8ecf4",
+                      borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box",
+                      background: "white",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
+              <button
+                onClick={() => { setShowEditModal(false); setEditError(""); }}
+                style={{ flex: 1, padding: "11px 0", background: "#f4f6fb", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={updateApplication}
+                disabled={editLoading}
+                style={{ flex: 2, padding: "11px 0", background: "#3b5bdb", color: "white", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", opacity: editLoading ? 0.7 : 1 }}
+              >
+                {editLoading ? "Updating..." : "Update Application"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── STATUS UPDATE MODAL ── */}
+      {showStatusModal && statusApp && (
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setShowStatusModal(false); }}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
+            display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100,
+          }}
+        >
+          <div style={{
+            background: "white", borderRadius: 16, padding: 28, width: 400, maxWidth: "90vw",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+          }}>
+            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>Update Status</div>
+            <div style={{ fontSize: 13, color: "#7b8299", marginBottom: 20 }}>
+              {statusApp.company} - {statusApp.position}
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+              {(["applied", "interviewing", "offer", "rejected"] as StatusType[]).map(status => (
+                <button
+                  key={status}
+                  onClick={() => setNewStatus(status)}
+                  style={{
+                    padding: "12px 16px", borderRadius: 10, border: `2px solid ${newStatus === status ? FILTER_ACTIVE_COLORS[status] : "#e8ecf4"}`,
+                    background: newStatus === status ? `${FILTER_ACTIVE_COLORS[status]}10` : "white",
+                    cursor: "pointer", fontSize: 14, fontWeight: 600, textAlign: "left",
+                    color: newStatus === status ? FILTER_ACTIVE_COLORS[status] : "#1a1d2e",
+                    fontFamily: "inherit", display: "flex", alignItems: "center", gap: 10,
+                  }}
+                >
+                  <div style={{
+                    width: 20, height: 20, borderRadius: "50%",
+                    border: `2px solid ${newStatus === status ? FILTER_ACTIVE_COLORS[status] : "#d0d5dd"}`,
+                    background: newStatus === status ? FILTER_ACTIVE_COLORS[status] : "white",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    {newStatus === status && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "white" }} />}
+                  </div>
+                  {STATUS_CONFIG[status].label}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={() => setShowStatusModal(false)}
+                style={{ flex: 1, padding: "11px 0", background: "#f4f6fb", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={updateStatus}
+                disabled={statusLoading || newStatus === statusApp.status}
+                style={{ 
+                  flex: 2, padding: "11px 0", 
+                  background: newStatus === statusApp.status ? "#d0d5dd" : "#3b5bdb", 
+                  color: "white", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, 
+                  cursor: newStatus === statusApp.status ? "not-allowed" : "pointer", 
+                  fontFamily: "inherit", 
+                  opacity: statusLoading ? 0.7 : 1 
+                }}
+              >
+                {statusLoading ? "Updating..." : "Update Status"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── DELETE CONFIRMATION MODAL ── */}
+      {showDeleteModal && deletingApp && (
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setShowDeleteModal(false); }}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
+            display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100,
+          }}
+        >
+          <div style={{
+            background: "white", borderRadius: 16, padding: 28, width: 400, maxWidth: "90vw",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+          }}>
+            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6, color: "#e03131" }}>Delete Application?</div>
+            <div style={{ fontSize: 13, color: "#7b8299", marginBottom: 20, lineHeight: 1.5 }}>
+              Are you sure you want to delete your application to <strong>{deletingApp.company}</strong> for <strong>{deletingApp.position}</strong>? This action cannot be undone.
+            </div>
+
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                style={{ flex: 1, padding: "11px 0", background: "#f4f6fb", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteApplication}
+                disabled={deleteLoading}
+                style={{ flex: 1, padding: "11px 0", background: "#e03131", color: "white", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", opacity: deleteLoading ? 0.7 : 1 }}
+              >
+                {deleteLoading ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>

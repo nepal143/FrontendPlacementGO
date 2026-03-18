@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../component/Navbar";
 import {
   Link as LinkIcon,
@@ -17,7 +19,15 @@ import {
 } from "lucide-react";
 
 export default function ReferralFinder() {
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
   const [copied, setCopied] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isLoggedIn) router.push("/login");
+  }, [isLoggedIn]);
+
+  if (!isLoggedIn) return null;
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -27,7 +37,7 @@ export default function ReferralFinder() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans selection:bg-blue-100">
-      {/* --- HEADER --- */}
+        {/* --- HEADER --- */}
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <Navbar />
       </nav>
