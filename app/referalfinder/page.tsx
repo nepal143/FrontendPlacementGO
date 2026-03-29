@@ -32,32 +32,37 @@ export default function ReferralFinder() {
 
   if (authLoading || !isLoggedIn) return null;
 
-  const handleFind = async () => {
-    if (!company.trim() || !role.trim()) {
-      setError("Please enter both company name and job role");
+ const handleFind = async () => {
+  if (!company.trim() || !role.trim()) {
+    setError("Please enter both company name and job role");
+    return;
+  }
+  setAnalyzing(true);
+  setError(null);
+  setReferralData(null);
+
+  try {
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+
+    if (!token) {
+      setError("Authentication required. Please log in again.");
+      setAnalyzing(false);
       return;
     }
-    setAnalyzing(true);
-    setError(null);
-    setReferralData(null);
 
-    try {
-      const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+    // JWT token se userId decode karo
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const userId = payload.userId || payload.sub; // token mein jo field hai woh use karo
 
-      if (!token) {
-        setError("Authentication required. Please log in again.");
-        setAnalyzing(false);
-        return;
-      }
-
-      const response = await fetch(`${API_BASE_URL}/api/referrals`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({ company: company.trim(), role: role.trim() }),
-      });
+    const response = await fetch(`${API_BASE_URL}/api/referrals`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+        "userId": userId  // ✅ Yeh add karo
+      },
+      body: JSON.stringify({ company: company.trim(), role: role.trim() }),
+    });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
