@@ -1,8 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
+import { useResumes } from "../../hooks/useResume";
+import { getResumeDetail, deleteResume as deleteResumeApi } from "../../services/resume.service";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -135,11 +138,13 @@ const NavItem = ({
   label,
   href,
   active = false,
+  isDark = false,
 }: {
   icon: React.ReactNode;
   label: string;
   href: string;
   active?: boolean;
+  isDark?: boolean;
 }) => (
   <Link
     href={href}
@@ -152,8 +157,8 @@ const NavItem = ({
       borderRadius: 8,
       fontSize: 13.5,
       fontWeight: active ? 600 : 500,
-      color: active ? "#3b5bdb" : "#7b8299",
-      background: active ? "#eef2ff" : "transparent",
+      color: active ? "#3b5bdb" : (isDark ? "#94a3b8" : "#7b8299"),
+      background: active ? (isDark ? "#1e3a8a20" : "#eef2ff") : "transparent",
       cursor: "pointer",
       transition: "all 0.15s",
       textDecoration: "none",
@@ -165,34 +170,34 @@ const NavItem = ({
 );
 
 const StatCard = ({
-  title, icon, iconBg, value, badge, badgeType, sub
+  title, icon, iconBg, value, badge, badgeType, sub, isDark
 }: {
   title: string; icon: string; iconBg: string;
   value: number | string; badge: string;
-  badgeType: "up" | "down" | "neutral"; sub: string;
+  badgeType: "up" | "down" | "neutral"; sub: string; isDark?: boolean;
 }) => {
   const badgeColors = {
     up:      { bg: "#ebfbee", color: "#2f9e44" },
     down:    { bg: "#fff5f5", color: "#c92a2a" },
-    neutral: { bg: "#f1f3f5", color: "#495057" },
+    neutral: { bg: isDark ? "#334155" : "#f1f3f5", color: isDark ? "#94a3b8" : "#495057" },
   };
   const bc = badgeColors[badgeType];
   return (
     <div style={{
-      background: "white", border: "1px solid #e8ecf4", borderRadius: 14,
+      background: isDark ? "#1e293b" : "white", border: `1px solid ${isDark ? "#334155" : "#e8ecf4"}`, borderRadius: 14,
       padding: "20px 22px", display: "flex", flexDirection: "column", gap: 10,
     }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, color: "#7b8299", fontWeight: 500 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, color: isDark ? "#94a3b8" : "#7b8299", fontWeight: 500 }}>
         {title}
         <div style={{ width: 36, height: 36, borderRadius: 10, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
           {icon}
         </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 30, fontWeight: 800, color: "#1a1d2e" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 30, fontWeight: 800, color: isDark ? "#e2e8f0" : "#1a1d2e" }}>
         {value}
         <span style={{ fontSize: 12, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: bc.bg, color: bc.color }}>{badge}</span>
       </div>
-      <div style={{ fontSize: 12, color: "#7b8299" }}>{sub}</div>
+      <div style={{ fontSize: 12, color: isDark ? "#94a3b8" : "#7b8299" }}>{sub}</div>
     </div>
   );
 };
@@ -282,7 +287,20 @@ const EditIcon = () => (
 
 export default function Dashboard() {
   const router = useRouter();
-  const { isLoggedIn, logout, userEmail } = useAuth();
+  const { isLoggedIn, loading: authLoading, logout, userEmail } = useAuth();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const cs = {
+    pageBg:      isDark ? "#0f172a" : "#f4f6fb",
+    cardBg:      isDark ? "#1e293b" : "white",
+    border:      isDark ? "#334155" : "#e8ecf4",
+    text:        isDark ? "#e2e8f0" : "#1a1d2e",
+    textMuted:   isDark ? "#94a3b8" : "#7b8299",
+    inputBg:     isDark ? "#0f172a" : "white",
+    chipBg:      isDark ? "#334155" : "#f4f6fb",
+    tableHdrBg:  isDark ? "#1e293b" : "#fafbfd",
+    labelText:   isDark ? "#94a3b8" : "#4a4f6b",
+  };
   const [applications, setApplications] = useState<Application[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
@@ -311,18 +329,28 @@ export default function Dashboard() {
   const [deletingApp, setDeletingApp] = useState<Application | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // Search
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Resumes
+  const { resumes, loading: resumesLoading, refresh: refetchResumes } = useResumes();
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [deletingResumeId, setDeletingResumeId] = useState<string | null>(null);
+
   const userInitials = userEmail ? userEmail.slice(0, 2).toUpperCase() : "U";
   const greeting = userEmail ? userEmail.split("@")[0] : "there";
 
-  const API_BASE_URL = "http://localhost:8080";
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (authLoading) return;
+    const token = localStorage.getItem("token");
+    if (!token) {
       router.push("/login");
       return;
     }
     fetchApplications();
-  }, [isLoggedIn]);
+  }, [authLoading]);
 
   // ─── API Functions ────────────────────────────────────────────────────────
 
@@ -342,11 +370,6 @@ export default function Dashboard() {
       });
       
       if (!res.ok) {
-        if (res.status === 401) {
-          logout();
-          router.push("/login");
-          return;
-        }
         throw new Error("Failed to fetch applications");
       }
       
@@ -526,9 +549,25 @@ export default function Dashboard() {
 
   // ─── Computed Values ──────────────────────────────────────────────────────
 
-  const filtered = activeFilter === "all"
-    ? applications
-    : applications.filter(a => a.status === activeFilter);
+const filtered = (() => {
+  let regex: RegExp | null = null;
+  if (searchQuery.trim() !== "") {
+    try {
+      regex = new RegExp(searchQuery, "i");
+    } catch {
+      // Invalid regex — fall back to plain string match
+      regex = new RegExp(searchQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    }
+  }
+
+  return applications
+    .filter(a => activeFilter === "all" || a.status === activeFilter)
+    .filter(a => {
+      if (!regex) return true;
+      return regex.test(a.company) || regex.test(a.position);
+    });
+})();
+
 
   const stats = {
     total: applications.length,
@@ -536,19 +575,19 @@ export default function Dashboard() {
     offers: applications.filter(a => a.status === "offer").length,
   };
 
-  if (!isLoggedIn) return null;
+  if (authLoading) return null;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f4f6fb", fontFamily: "'DM Sans', sans-serif", color: "#1a1d2e" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: cs.pageBg, fontFamily: "'DM Sans', sans-serif", color: cs.text }}>
 
       {/* ── SIDEBAR ── */}
       <aside style={{
-        width: 220, background: "white", borderRight: "1px solid #e8ecf4",
+        width: 220, background: cs.cardBg, borderRight: `1px solid ${cs.border}`,
         display: "flex", flexDirection: "column", padding: "24px 0",
         position: "fixed", height: "100vh", zIndex: 10,
       }}>
         <Link href="/" style={{ textDecoration: "none" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 20px 28px", borderBottom: "1px solid #e8ecf4" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 20px 28px", borderBottom: `1px solid ${cs.border}` }}>
             <div style={{
               width: 36, height: 36, borderRadius: 10,
               background: "linear-gradient(135deg, #3b5bdb, #748ffc)",
@@ -558,16 +597,16 @@ export default function Dashboard() {
           </div>
         </Link>
 
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: "#7b8299", padding: "20px 20px 8px" }}>Menu</span>
-        <NavItem icon={<DashboardIcon />} label="Dashboard" href="/dashboard" active />
-        <NavItem icon={<DocIcon />} label="Resume Optimizer" href="/resumeoptimizer" />
-        <NavItem icon={<UsersIcon />} label="Referral Finder" href="/referalfinder" />
-        <NavItem icon={<CalendarIcon />} label="Interview Guide" href="/interview" />
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: cs.textMuted, padding: "20px 20px 8px" }}>Menu</span>
+        <NavItem icon={<DashboardIcon />} label="Dashboard" href="/dashboard" active isDark={isDark} />
+        <NavItem icon={<DocIcon />} label="Resume Optimizer" href="/resumeoptimizer" isDark={isDark} />
+        <NavItem icon={<UsersIcon />} label="Referral Finder" href="/referalfinder" isDark={isDark} />
+        <NavItem icon={<CalendarIcon />} label="Interview Guide" href="/interview" isDark={isDark} />
 
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: "#7b8299", padding: "20px 20px 8px" }}>Account</span>
-        <NavItem icon={<SettingsIcon />} label="Settings" href="/settings" />
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: cs.textMuted, padding: "20px 20px 8px" }}>Account</span>
+        <NavItem icon={<SettingsIcon />} label="Settings" href="/settings" isDark={isDark} />
 
-        <div style={{ marginTop: "auto", padding: 16, borderTop: "1px solid #e8ecf4" }}>
+        <div style={{ marginTop: "auto", padding: 16, borderTop: `1px solid ${cs.border}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 10, borderRadius: 10 }}>
             <div style={{
               width: 36, height: 36, borderRadius: "50%",
@@ -576,10 +615,10 @@ export default function Dashboard() {
               color: "white", fontWeight: 700, fontSize: 13, flexShrink: 0,
             }}>{userInitials}</div>
             <div style={{ overflow: "hidden" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <div style={{ fontSize: 12, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: cs.text }}>
                 {userEmail || "User"}
               </div>
-              <div style={{ fontSize: 11, color: "#7b8299" }}>Student Plan</div>
+              <div style={{ fontSize: 11, color: cs.textMuted }}>Student Plan</div>
             </div>
           </div>
           <button
@@ -598,10 +637,20 @@ export default function Dashboard() {
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28 }}>
           <div style={{
             display: "flex", alignItems: "center", gap: 10,
-            background: "white", border: "1px solid #e8ecf4", borderRadius: 10,
-            padding: "9px 14px", fontSize: 13.5, color: "#7b8299", maxWidth: 360, flex: 1,
+            background: cs.cardBg, border: `1px solid ${cs.border}`, borderRadius: 10,
+            padding: "9px 14px", maxWidth: 360, flex: 1,
           }}>
-            <SearchIcon /> Search applications, companies...
+            <SearchIcon />
+            <input
+              type="text"
+              placeholder="Search applications, companies..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{
+                border: "none", outline: "none", fontSize: 13.5, color: cs.text,
+                background: "transparent", flex: 1, fontFamily: "inherit",
+              }}
+            />
           </div>
           <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
             <button
@@ -616,24 +665,24 @@ export default function Dashboard() {
               <PlusIcon /> Add Application
             </button>
             <div style={{
-              width: 38, height: 38, borderRadius: 10, background: "white",
-              border: "1px solid #e8ecf4", display: "flex", alignItems: "center",
-              justifyContent: "center", color: "#7b8299",
+              width: 38, height: 38, borderRadius: 10, background: cs.cardBg,
+              border: `1px solid ${cs.border}`, display: "flex", alignItems: "center",
+              justifyContent: "center", color: cs.textMuted,
             }}><BellIcon /></div>
           </div>
         </div>
 
         {/* Greeting */}
         <div style={{ marginBottom: 4 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 800 }}>Good morning, {greeting} 👋</h1>
-          <p style={{ fontSize: 13.5, color: "#7b8299", marginTop: 4 }}>Here's a summary of your career progress today.</p>
+          <h1 style={{ fontSize: 24, fontWeight: 800 }}>Welcome Again, {greeting} 👋</h1>
+          <p style={{ fontSize: 13.5, color: cs.textMuted, marginTop: 4 }}>Here's a summary of your career progress today.</p>
         </div>
 
         {/* Stat Cards */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, margin: "24px 0" }}>
-          <StatCard title="Total Applications" icon="📋" iconBg="#e7f5ff" value={stats.total} badge={stats.total > 0 ? "active" : "none yet"} badgeType={stats.total > 0 ? "up" : "neutral"} sub="All tracked applications" />
-          <StatCard title="Interviewing" icon="🎥" iconBg="#ebfbee" value={stats.interviewing} badge={stats.interviewing > 0 ? "active" : "none"} badgeType={stats.interviewing > 0 ? "up" : "neutral"} sub="Currently active pipelines" />
-          <StatCard title="Offers Received" icon="🏆" iconBg="#f3f0ff" value={stats.offers} badge={stats.offers > 0 ? "🎉" : "keep going"} badgeType={stats.offers > 0 ? "up" : "neutral"} sub="Offers in your pipeline" />
+          <StatCard title="Total Applications" icon="📋" iconBg="#e7f5ff" value={stats.total} badge={stats.total > 0 ? "active" : "none yet"} badgeType={stats.total > 0 ? "up" : "neutral"} sub="All tracked applications" isDark={isDark} />
+          <StatCard title="Interviewing" icon="🎥" iconBg="#ebfbee" value={stats.interviewing} badge={stats.interviewing > 0 ? "active" : "none"} badgeType={stats.interviewing > 0 ? "up" : "neutral"} sub="Currently active pipelines" isDark={isDark} />
+          <StatCard title="Offers Received" icon="🏆" iconBg="#f3f0ff" value={stats.offers} badge={stats.offers > 0 ? "🎉" : "keep going"} badgeType={stats.offers > 0 ? "up" : "neutral"} sub="Offers in your pipeline" isDark={isDark} />
         </div>
 
         {/* Two Col Layout */}
@@ -642,7 +691,7 @@ export default function Dashboard() {
           {/* LEFT */}
           <div>
             {/* Quick Actions */}
-            <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 14 }}>Quick Actions</div>
+            <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 14, color: cs.text }}>Quick Actions</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 24 }}>
               {[
                 { icon: <UploadIcon />, label: "Upload CV", href: "/resumeoptimizer" },
@@ -653,18 +702,18 @@ export default function Dashboard() {
                 "href" in qa ? (
                   <Link key={qa.label} href={qa.href!} style={{
                     display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-                    background: "white", border: "1px solid #e8ecf4", borderRadius: 12,
+                    background: cs.cardBg, border: `1px solid ${cs.border}`, borderRadius: 12,
                     padding: "16px 10px", cursor: "pointer", fontSize: 12.5, fontWeight: 500,
-                    color: "#1a1d2e", textDecoration: "none", fontFamily: "inherit",
+                    color: cs.text, textDecoration: "none", fontFamily: "inherit",
                   }}>
                     {qa.icon}{qa.label}
                   </Link>
                 ) : (
                   <button key={qa.label} onClick={qa.onClick} style={{
                     display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-                    background: "white", border: "1px solid #e8ecf4", borderRadius: 12,
+                    background: cs.cardBg, border: `1px solid ${cs.border}`, borderRadius: 12,
                     padding: "16px 10px", cursor: "pointer", fontSize: 12.5, fontWeight: 500,
-                    color: "#1a1d2e", fontFamily: "inherit",
+                    color: cs.text, fontFamily: "inherit",
                   }}>
                     {qa.icon}{qa.label}
                   </button>
@@ -673,9 +722,9 @@ export default function Dashboard() {
             </div>
 
             {/* Pipeline Card */}
-            <div style={{ background: "white", border: "1px solid #e8ecf4", borderRadius: 14, overflow: "hidden" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", borderBottom: "1px solid #e8ecf4" }}>
-                <span style={{ fontSize: 15, fontWeight: 700 }}>Active Pipeline</span>
+            <div style={{ background: cs.cardBg, border: `1px solid ${cs.border}`, borderRadius: 14, overflow: "hidden" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", borderBottom: `1px solid ${cs.border}` }}>
+                <span style={{ fontSize: 15, fontWeight: 700, color: cs.text }}>Active Pipeline</span>
                 <button
                   onClick={() => setShowAddModal(true)}
                   style={{ fontSize: 13, color: "#3b5bdb", fontWeight: 600, cursor: "pointer", background: "none", border: "none", fontFamily: "inherit" }}
@@ -685,7 +734,7 @@ export default function Dashboard() {
               </div>
 
               {/* Status Filter Chips */}
-              <div style={{ display: "flex", gap: 8, padding: "12px 20px", borderBottom: "1px solid #e8ecf4", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: 8, padding: "12px 20px", borderBottom: `1px solid ${cs.border}`, flexWrap: "wrap" }}>
                 {FILTERS.map(f => {
                   const isActive = activeFilter === f.value;
                   const activeColor = FILTER_ACTIVE_COLORS[f.value];
@@ -697,15 +746,15 @@ export default function Dashboard() {
                         padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600,
                         cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s",
                         border: isActive ? `1.5px solid ${activeColor}` : "1.5px solid transparent",
-                        background: isActive ? activeColor : "#f4f6fb",
-                        color: isActive ? "white" : "#7b8299",
+                        background: isActive ? activeColor : cs.chipBg,
+                        color: isActive ? "white" : cs.textMuted,
                         fontFamily: "inherit",
                       }}
                     >
                       {f.label}
                       {f.value !== "all" && (
                         <span style={{
-                          marginLeft: 5, background: isActive ? "rgba(255,255,255,0.25)" : "#e8ecf4",
+                          marginLeft: 5, background: isActive ? "rgba(255,255,255,0.25)" : (isDark ? "#475569" : "#e8ecf4"),
                           padding: "1px 6px", borderRadius: 10, fontSize: 10,
                         }}>
                           {applications.filter(a => a.status === f.value).length}
@@ -719,11 +768,11 @@ export default function Dashboard() {
               {/* Table */}
               <div style={{ overflowX: "auto" }}>
                 {loadingData ? (
-                  <div style={{ textAlign: "center", padding: "40px 20px", color: "#7b8299", fontSize: 13.5 }}>
+                  <div style={{ textAlign: "center", padding: "40px 20px", color: cs.textMuted, fontSize: 13.5 }}>
                     Loading your applications...
                   </div>
                 ) : filtered.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "40px 20px", color: "#7b8299", fontSize: 13.5 }}>
+                  <div style={{ textAlign: "center", padding: "40px 20px", color: cs.textMuted, fontSize: 13.5 }}>
                     {applications.length === 0
                       ? "No applications yet — add your first one above!"
                       : "No applications found for this status."}
@@ -731,9 +780,9 @@ export default function Dashboard() {
                 ) : (
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
-                      <tr style={{ background: "#fafbfd", borderBottom: "1px solid #e8ecf4" }}>
+                      <tr style={{ background: cs.tableHdrBg, borderBottom: `1px solid ${cs.border}` }}>
                         {["Company", "Position", "Status", "Added", "Actions"].map(h => (
-                          <th key={h} style={{ textAlign: "left", fontSize: 11, fontWeight: 700, letterSpacing: "0.8px", textTransform: "uppercase", color: "#7b8299", padding: "10px 20px" }}>
+                          <th key={h} style={{ textAlign: "left", fontSize: 11, fontWeight: 700, letterSpacing: "0.8px", textTransform: "uppercase", color: cs.textMuted, padding: "10px 20px" }}>
                             {h}
                           </th>
                         ))}
@@ -745,11 +794,11 @@ export default function Dashboard() {
                           key={app.id} 
                           onClick={(e) => handleRowClick(app, e)}
                           style={{ 
-                            borderBottom: i < filtered.length - 1 ? "1px solid #e8ecf4" : "none", 
+                            borderBottom: i < filtered.length - 1 ? `1px solid ${cs.border}` : "none", 
                             cursor: "pointer",
                             transition: "background 0.15s",
                           }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = "#fafbfd"}
+                          onMouseEnter={(e) => e.currentTarget.style.background = cs.tableHdrBg}
                           onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                         >
                           <td style={{ padding: "14px 20px" }}>
@@ -759,19 +808,41 @@ export default function Dashboard() {
                                 background: app.logoColor, display: "flex", alignItems: "center",
                                 justifyContent: "center", color: "white", fontWeight: 800, fontSize: 13, flexShrink: 0,
                               }}>{app.logo}</div>
-                              <span style={{ fontWeight: 600, fontSize: 13.5 }}>{app.company}</span>
+                              <span style={{ fontWeight: 600, fontSize: 13.5, color: cs.text }}>{app.company}</span>
                             </div>
                           </td>
-                          <td style={{ padding: "14px 20px", fontSize: 13 }}>{app.position}</td>
+                          <td style={{ padding: "14px 20px", fontSize: 13, color: cs.text }}>{app.position}</td>
                           <td style={{ padding: "14px 20px" }}><StatusPill status={app.status} /></td>
-                          <td style={{ padding: "14px 20px", fontSize: 12, color: "#7b8299" }}>{app.activity}</td>
+                          <td style={{ padding: "14px 20px", fontSize: 12, color: cs.textMuted }}>
+                            {app.appliedDate
+                              ? new Date(app.appliedDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })
+                              : app.activity}
+                          </td>
                           <td style={{ padding: "14px 20px" }}>
                             <div style={{ display: "flex", gap: 8 }}>
+                              {app.jobLink && (
+                                <a
+                                  href={app.jobLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{
+                                    padding: "6px 10px", borderRadius: 6, border: `1px solid ${cs.border}`,
+                                    background: cs.cardBg, cursor: "pointer", display: "flex", alignItems: "center",
+                                    gap: 4, fontSize: 12, fontWeight: 500, color: "#2e7d32", textDecoration: "none",
+                                  }}
+                                  title="View Job Posting"
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                                  </svg>
+                                </a>
+                              )}
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleEdit(app); }}
                                 style={{
-                                  padding: "6px 10px", borderRadius: 6, border: "1px solid #e8ecf4",
-                                  background: "white", cursor: "pointer", display: "flex", alignItems: "center",
+                                  padding: "6px 10px", borderRadius: 6, border: `1px solid ${cs.border}`,
+                                  background: cs.cardBg, cursor: "pointer", display: "flex", alignItems: "center",
                                   gap: 4, fontSize: 12, fontWeight: 500, color: "#3b5bdb", fontFamily: "inherit",
                                 }}
                                 title="Edit"
@@ -781,8 +852,8 @@ export default function Dashboard() {
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleDelete(app); }}
                                 style={{
-                                  padding: "6px 10px", borderRadius: 6, border: "1px solid #e8ecf4",
-                                  background: "white", cursor: "pointer", display: "flex", alignItems: "center",
+                                  padding: "6px 10px", borderRadius: 6, border: `1px solid ${cs.border}`,
+                                  background: cs.cardBg, cursor: "pointer", display: "flex", alignItems: "center",
                                   gap: 4, fontSize: 12, fontWeight: 500, color: "#e03131", fontFamily: "inherit",
                                 }}
                                 title="Delete"
@@ -804,8 +875,8 @@ export default function Dashboard() {
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
             {/* Status Breakdown */}
-            <div style={{ background: "white", border: "1px solid #e8ecf4", borderRadius: 14, padding: 18 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 14 }}>Status Breakdown</div>
+            <div style={{ background: cs.cardBg, border: `1px solid ${cs.border}`, borderRadius: 14, padding: 18 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 14, color: cs.text }}>Status Breakdown</div>
               {FILTERS.filter(f => f.value !== "all").map(f => {
                 const count = applications.filter(a => a.status === f.value).length;
                 const pct = applications.length > 0 ? Math.round((count / applications.length) * 100) : 0;
@@ -814,16 +885,16 @@ export default function Dashboard() {
                   <div key={f.value} style={{ marginBottom: 12 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, fontWeight: 500, marginBottom: 4 }}>
                       <span>{f.label}</span>
-                      <span style={{ color: "#7b8299" }}>{count} ({pct}%)</span>
+                      <span style={{ color: cs.textMuted }}>{count} ({pct}%)</span>
                     </div>
-                    <div style={{ height: 6, background: "#f4f6fb", borderRadius: 10, overflow: "hidden" }}>
+                    <div style={{ height: 6, background: cs.chipBg, borderRadius: 10, overflow: "hidden" }}>
                       <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 10, transition: "width 0.4s" }} />
                     </div>
                   </div>
                 );
               })}
               {applications.length === 0 && (
-                <div style={{ fontSize: 12, color: "#7b8299", textAlign: "center", paddingTop: 4 }}>
+                <div style={{ fontSize: 12, color: cs.textMuted, textAlign: "center", paddingTop: 4 }}>
                   Add applications to see your breakdown
                 </div>
               )}
@@ -847,6 +918,119 @@ export default function Dashboard() {
 
           </div>
         </div>
+
+        {/* ── MY RESUMES ── */}
+        <div style={{ marginTop: 32 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: cs.text }}>My Optimized Resumes</span>
+            <Link href="/resumeoptimizer" style={{ fontSize: 13, color: "#3b5bdb", fontWeight: 600, textDecoration: "none" }}>+ Generate new</Link>
+          </div>
+
+          {resumesLoading ? (
+            <div style={{ fontSize: 13, color: cs.textMuted, textAlign: "center", padding: "32px 0" }}>Loading resumes...</div>
+          ) : resumes.length === 0 ? (
+            <div style={{
+              background: cs.cardBg, border: `1.5px dashed ${cs.border}`, borderRadius: 14,
+              padding: "36px 24px", textAlign: "center", color: cs.textMuted, fontSize: 13,
+            }}>
+              No optimized resumes yet —{" "}
+              <Link href="/resumeoptimizer" style={{ color: "#3b5bdb", fontWeight: 600, textDecoration: "none" }}>generate one now</Link>.
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
+              {resumes.slice(0, 6).map((r) => (
+                <div key={r.id} style={{
+                  background: cs.cardBg, border: `1px solid ${cs.border}`, borderRadius: 14,
+                  padding: "16px 18px", display: "flex", flexDirection: "column", gap: 10,
+                }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                      </svg>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: cs.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {r.originalFileName || "resume"}
+                      </span>
+                    </div>
+                    <span style={{
+                      flexShrink: 0, fontSize: 11, fontWeight: 600, padding: "2px 8px",
+                      borderRadius: 20, background: "#e7f5ff", color: "#1971c2",
+                    }}>{r.templateName ?? "classic"}</span>
+                  </div>
+                  <p style={{ fontSize: 12, color: cs.textMuted, lineHeight: 1.5, margin: 0,
+                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden",
+                  }}>
+                    {r.jobDescriptionSnippet || "No job description."}
+                  </p>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: `1px solid ${cs.border}`, paddingTop: 10, marginTop: "auto" }}>
+                    <span style={{ fontSize: 11, color: cs.textMuted }}>
+                      {new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                    </span>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button
+                        disabled={downloadingId === r.id}
+                        onClick={async () => {
+                          setDownloadingId(r.id);
+                          try {
+                            const detail = await getResumeDetail(r.id);
+                            const binary = atob(detail.pdfBase64);
+                            const arr = new Uint8Array(binary.length);
+                            for (let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
+                            const blob = new Blob([arr], { type: "application/pdf" });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url; a.download = `optimized-${r.originalFileName || "resume"}.pdf`;
+                            a.click(); URL.revokeObjectURL(url);
+                          } catch { /* ignore */ } finally { setDownloadingId(null); }
+                        }}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 5,
+                          fontSize: 12, fontWeight: 600, color: downloadingId === r.id ? "#adb5bd" : "#3b5bdb",
+                          background: "none", border: "none", cursor: downloadingId === r.id ? "not-allowed" : "pointer",
+                          fontFamily: "inherit", padding: 0,
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                          <polyline points="7 10 12 15 17 10"/>
+                          <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        {downloadingId === r.id ? "..." : "Download"}
+                      </button>
+                      <button
+                        disabled={deletingResumeId === r.id}
+                        onClick={async () => {
+                          if (!confirm(`Delete "${r.originalFileName || "resume"}"?`)) return;
+                          setDeletingResumeId(r.id);
+                          try {
+                            await deleteResumeApi(r.id);
+                            refetchResumes?.();
+                          } catch { /* ignore */ } finally { setDeletingResumeId(null); }
+                        }}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 4,
+                          fontSize: 12, fontWeight: 600, color: deletingResumeId === r.id ? "#adb5bd" : "#e03131",
+                          background: "none", border: "none", cursor: deletingResumeId === r.id ? "not-allowed" : "pointer",
+                          fontFamily: "inherit", padding: 0,
+                        }}
+                      >
+                        <TrashIcon />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {resumes.length > 6 && (
+            <div style={{ textAlign: "center", marginTop: 12 }}>
+              <Link href="/resumeoptimizer" style={{ fontSize: 13, color: "#3b5bdb", fontWeight: 600, textDecoration: "none" }}>
+                View all {resumes.length} resumes →
+              </Link>
+            </div>
+          )}
+        </div>
+
       </main>
 
       {/* ── ADD APPLICATION MODAL ── */}
@@ -859,10 +1043,10 @@ export default function Dashboard() {
           }}
         >
           <div style={{
-            background: "white", borderRadius: 16, padding: 28, width: 440, maxWidth: "90vw",
+            background: cs.cardBg, borderRadius: 16, padding: 28, width: 440, maxWidth: "90vw",
             boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
           }}>
-            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 20 }}>Log New Application</div>
+            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 20, color: cs.text }}>Log New Application</div>
 
             {addError && (
               <div style={{ background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#c92a2a", marginBottom: 16 }}>
@@ -878,16 +1062,19 @@ export default function Dashboard() {
                 { label: "Applied Date", key: "appliedDate", placeholder: "", type: "date" },
               ].map(field => (
                 <div key={field.key}>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#4a4f6b", marginBottom: 6 }}>{field.label}</label>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: cs.labelText, marginBottom: 6 }}>{field.label}</label>
                   <input
                     type={field.type}
                     placeholder={field.placeholder}
                     value={(addForm as Record<string, string>)[field.key]}
+               
+min={field.type === "date" ? "2026-01-01" : undefined}
+max={field.type === "date" ? "2099-12-31" : undefined}
                     onChange={e => setAddForm(prev => ({ ...prev, [field.key]: e.target.value }))}
                     style={{
-                      width: "100%", padding: "10px 14px", fontSize: 13, border: "1.5px solid #e8ecf4",
+                      width: "100%", padding: "10px 14px", fontSize: 13, border: `1.5px solid ${cs.border}`,
                       borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box",
-                      background: "white",
+                      background: cs.inputBg, color: cs.text,
                     }}
                   />
                 </div>
@@ -897,7 +1084,7 @@ export default function Dashboard() {
             <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
               <button
                 onClick={() => { setShowAddModal(false); setAddError(""); setAddForm({ company: "", role: "", jobLink: "", appliedDate: "" }); }}
-                style={{ flex: 1, padding: "11px 0", background: "#f4f6fb", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ flex: 1, padding: "11px 0", background: cs.chipBg, border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", color: cs.text }}
               >
                 Cancel
               </button>
@@ -923,10 +1110,10 @@ export default function Dashboard() {
           }}
         >
           <div style={{
-            background: "white", borderRadius: 16, padding: 28, width: 440, maxWidth: "90vw",
+            background: cs.cardBg, borderRadius: 16, padding: 28, width: 440, maxWidth: "90vw",
             boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
           }}>
-            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 20 }}>Edit Application</div>
+            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 20, color: cs.text }}>Edit Application</div>
 
             {editError && (
               <div style={{ background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#c92a2a", marginBottom: 16 }}>
@@ -942,16 +1129,18 @@ export default function Dashboard() {
                 { label: "Applied Date", key: "appliedDate", placeholder: "", type: "date" },
               ].map(field => (
                 <div key={field.key}>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#4a4f6b", marginBottom: 6 }}>{field.label}</label>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: cs.labelText, marginBottom: 6 }}>{field.label}</label>
                   <input
                     type={field.type}
                     placeholder={field.placeholder}
                     value={(editForm as Record<string, string>)[field.key]}
+                  min={field.type === "date" ? "2026-01-01" : undefined}
+max={field.type === "date" ? "2099-12-31" : undefined}
                     onChange={e => setEditForm(prev => ({ ...prev, [field.key]: e.target.value }))}
                     style={{
-                      width: "100%", padding: "10px 14px", fontSize: 13, border: "1.5px solid #e8ecf4",
+                      width: "100%", padding: "10px 14px", fontSize: 13, border: `1.5px solid ${cs.border}`,
                       borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box",
-                      background: "white",
+                      background: cs.inputBg, color: cs.text,
                     }}
                   />
                 </div>
@@ -961,7 +1150,7 @@ export default function Dashboard() {
             <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
               <button
                 onClick={() => { setShowEditModal(false); setEditError(""); }}
-                style={{ flex: 1, padding: "11px 0", background: "#f4f6fb", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ flex: 1, padding: "11px 0", background: cs.chipBg, border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", color: cs.text }}
               >
                 Cancel
               </button>
@@ -987,11 +1176,11 @@ export default function Dashboard() {
           }}
         >
           <div style={{
-            background: "white", borderRadius: 16, padding: 28, width: 400, maxWidth: "90vw",
+            background: cs.cardBg, borderRadius: 16, padding: 28, width: 400, maxWidth: "90vw",
             boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
           }}>
-            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>Update Status</div>
-            <div style={{ fontSize: 13, color: "#7b8299", marginBottom: 20 }}>
+            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6, color: cs.text }}>Update Status</div>
+            <div style={{ fontSize: 13, color: cs.textMuted, marginBottom: 20 }}>
               {statusApp.company} - {statusApp.position}
             </div>
 
@@ -1001,10 +1190,10 @@ export default function Dashboard() {
                   key={status}
                   onClick={() => setNewStatus(status)}
                   style={{
-                    padding: "12px 16px", borderRadius: 10, border: `2px solid ${newStatus === status ? FILTER_ACTIVE_COLORS[status] : "#e8ecf4"}`,
-                    background: newStatus === status ? `${FILTER_ACTIVE_COLORS[status]}10` : "white",
+                    padding: "12px 16px", borderRadius: 10, border: `2px solid ${newStatus === status ? FILTER_ACTIVE_COLORS[status] : cs.border}`,
+                    background: newStatus === status ? `${FILTER_ACTIVE_COLORS[status]}10` : cs.inputBg,
                     cursor: "pointer", fontSize: 14, fontWeight: 600, textAlign: "left",
-                    color: newStatus === status ? FILTER_ACTIVE_COLORS[status] : "#1a1d2e",
+                    color: newStatus === status ? FILTER_ACTIVE_COLORS[status] : cs.text,
                     fontFamily: "inherit", display: "flex", alignItems: "center", gap: 10,
                   }}
                 >
@@ -1024,7 +1213,7 @@ export default function Dashboard() {
             <div style={{ display: "flex", gap: 10 }}>
               <button
                 onClick={() => setShowStatusModal(false)}
-                style={{ flex: 1, padding: "11px 0", background: "#f4f6fb", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ flex: 1, padding: "11px 0", background: cs.chipBg, border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", color: cs.text }}
               >
                 Cancel
               </button>
@@ -1057,18 +1246,18 @@ export default function Dashboard() {
           }}
         >
           <div style={{
-            background: "white", borderRadius: 16, padding: 28, width: 400, maxWidth: "90vw",
+            background: cs.cardBg, borderRadius: 16, padding: 28, width: 400, maxWidth: "90vw",
             boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
           }}>
             <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6, color: "#e03131" }}>Delete Application?</div>
-            <div style={{ fontSize: 13, color: "#7b8299", marginBottom: 20, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, color: cs.textMuted, marginBottom: 20, lineHeight: 1.5 }}>
               Are you sure you want to delete your application to <strong>{deletingApp.company}</strong> for <strong>{deletingApp.position}</strong>? This action cannot be undone.
             </div>
 
             <div style={{ display: "flex", gap: 10 }}>
               <button
                 onClick={() => setShowDeleteModal(false)}
-                style={{ flex: 1, padding: "11px 0", background: "#f4f6fb", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ flex: 1, padding: "11px 0", background: cs.chipBg, border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", color: cs.text }}
               >
                 Cancel
               </button>

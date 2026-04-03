@@ -19,15 +19,15 @@ import {
 } from "lucide-react";
 
 export default function ReferralFinder() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, loading: authLoading } = useAuth();
   const router = useRouter();
   const [copied, setCopied] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isLoggedIn) router.push("/login");
-  }, [isLoggedIn]);
+    if (!authLoading && !isLoggedIn) router.push("/login");
+  }, [authLoading, isLoggedIn]);
 
-  if (!isLoggedIn) return null;
+  if (authLoading || !isLoggedIn) return null;
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -152,6 +152,19 @@ export default function ReferralFinder() {
           />
         </div>
 
+        {/* --- EXPORT SECTION --- */}
+        <div className="flex justify-end mb-6">
+          <button
+            onClick={() => window.print()}
+            className="flex items-center gap-2 bg-white border border-slate-200 text-slate-700 hover:border-blue-400 hover:text-blue-600 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all print:hidden"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            Export as PDF
+          </button>
+        </div>
+
         {/* --- PRO TIP BAR --- */}
         <div className="bg-blue-50 border border-blue-100 rounded-[1.5rem] p-6 flex gap-4 items-start">
           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm shrink-0">
@@ -171,12 +184,12 @@ export default function ReferralFinder() {
         {/* --- FOOTER --- */}
         <footer className="mt-20 pt-12 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6 pb-12">
           <p className="text-slate-400 text-xs font-medium">
-            © 2024 PlacementGo Inc. All rights reserved.
+            © 2026 PlacementGO. All rights reserved.
           </p>
           <div className="flex gap-8 text-xs font-bold text-slate-400 uppercase tracking-widest">
-            <button className="hover:text-blue-600">Privacy Policy</button>
-            <button className="hover:text-blue-600">Terms of Service</button>
-            <button className="hover:text-blue-600">Help Center</button>
+            <a href="mailto:support@placementgo.in" className="hover:text-blue-600 transition-colors">Privacy Policy</a>
+            <a href="mailto:support@placementgo.in" className="hover:text-blue-600 transition-colors">Terms of Service</a>
+            <a href="mailto:support@placementgo.in" className="hover:text-blue-600 transition-colors">Help Center</a>
           </div>
         </footer>
       </main>

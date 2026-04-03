@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Navbar from "../component/Navbar"; // Adjust import path as needed
+import { apiFetch, API_BASE_URL } from "@/lib/api";
 import {
   CheckCircle,
   ArrowRight,
@@ -17,6 +18,7 @@ import {
   ListChecks,
   Lightbulb,
   Cpu,
+  FileDown,
 } from "lucide-react";
 
 export default function Home() {
@@ -35,6 +37,59 @@ export default function Home() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const downloadReport = () => {
+    if (!result) return;
+    const lines: string[] = [];
+    lines.push(`JD INTEL REPORT`);
+    lines.push(`Company: ${result.company}   Role: ${result.role}`);
+    lines.push(`Difficulty: ${result.difficultyLevel}   Confidence Score: ${result.confidenceScore}`);
+    lines.push(`\nSummary\n${result.sourceSummary}`);
+
+    if (result.focusAreas?.length) {
+      lines.push(`\nKey Focus Areas\n${result.focusAreas.join(", ")}`);
+    }
+
+    if (result.evaluationCriteria?.length) {
+      lines.push(`\nEvaluation Criteria`);
+      result.evaluationCriteria.forEach((c: any) => {
+        lines.push(`  ${c.name}: ${c.percentage}%`);
+      });
+    }
+
+    if (result.preparationChecklist?.length) {
+      lines.push(`\nPreparation Checklist`);
+      [...result.preparationChecklist]
+        .sort((a: any, b: any) => a.priority - b.priority)
+        .forEach((item: any, i: number) => {
+          lines.push(`  ${i + 1}. ${item.title}`);
+          lines.push(`     ${item.description}`);
+        });
+    }
+
+    if (result.systemDesignFocus?.length) {
+      lines.push(`\nSystem Design Focus\n${result.systemDesignFocus.join(", ")}`);
+    }
+
+    if (result.codingFocus?.length) {
+      lines.push(`\nCoding Focus\n${result.codingFocus.join(", ")}`);
+    }
+
+    if (result.companyTips?.length) {
+      lines.push(`\nInside Tips for ${result.company}`);
+      result.companyTips.forEach((tip: string, i: number) => {
+        lines.push(`  ${i + 1}. ${tip}`);
+      });
+    }
+
+    const blob = new Blob([lines.join("\n")], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `jd-intel-${result.company}-${result.role}.txt`.replace(/\s+/g, "-").toLowerCase();
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const analyzeJD = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -42,8 +97,8 @@ export default function Home() {
     setResult(null);
 
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/jd-intel/analyze",
+      const data = await apiFetch(
+        `${API_BASE_URL}/api/jd-intel/analyze`,
         {
           method: "POST",
           headers: {
@@ -53,12 +108,6 @@ export default function Home() {
           body: JSON.stringify(formData),
         },
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to analyze Job Description. Please try again.");
-      }
-
-      const data = await response.json();
       setResult(data);
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
@@ -68,11 +117,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-sans">
       <Navbar />
 
       {/* --- HERO / INPUT SECTION --- */}
-      <header className="relative pt-16 pb-12 px-8 max-w-7xl mx-auto">
+      <header className="relative pt-10 sm:pt-16 pb-8 sm:pb-12 px-4 sm:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full mb-6">
             <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
@@ -80,7 +129,7 @@ export default function Home() {
               AI Powered JD Intel
             </span>
           </div>
-          <h1 className="text-5xl font-extrabold leading-[1.1] mb-6">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.1] mb-6">
             Analyze the Job.{" "}
             <span className="text-blue-600">Crack the Interview.</span>
           </h1>
@@ -91,11 +140,11 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/50 border border-slate-100 max-w-4xl mx-auto relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 max-w-4xl mx-auto relative overflow-hidden">
           <form onSubmit={analyzeJD} className="space-y-6 relative z-10">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                   Company
                 </label>
                 <input
@@ -105,11 +154,11 @@ export default function Home() {
                   onChange={handleInputChange}
                   placeholder="e.g. Google"
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                   Role
                 </label>
                 <input
@@ -119,12 +168,12 @@ export default function Home() {
                   onChange={handleInputChange}
                   placeholder="e.g. Software Engineer"
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                 Job Description
               </label>
               <textarea
@@ -134,7 +183,7 @@ export default function Home() {
                 placeholder="Paste the full job description here..."
                 required
                 rows={6}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
               />
             </div>
             <button
@@ -165,18 +214,18 @@ export default function Home() {
 
       {/* --- RESULTS SECTION --- */}
       {result && (
-        <section className="py-12 px-8 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 border-b border-slate-200 pb-6">
+        <section className="py-8 sm:py-12 px-4 sm:px-8 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 sm:mb-10 border-b border-slate-200 dark:border-slate-700 pb-6">
             <div>
-              <h2 className="text-3xl font-extrabold mb-2 text-slate-900 flex items-center gap-3">
+              <h2 className="text-2xl sm:text-3xl font-extrabold mb-2 text-slate-900 dark:text-white flex items-center gap-3 flex-wrap">
                 {result.company} - {result.role}
                 <span className="text-sm px-3 py-1 bg-slate-100 text-slate-600 rounded-full font-bold">
                   {result.difficultyLevel} Difficulty
                 </span>
               </h2>
-              <p className="text-slate-500">{result.sourceSummary}</p>
+              <p className="text-slate-500 dark:text-slate-400">{result.sourceSummary}</p>
             </div>
-            <div className="mt-4 md:mt-0 flex flex-col items-end">
+            <div className="mt-4 md:mt-0 flex flex-col items-end gap-3">
               <div className="flex items-center gap-3">
                 <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">
                   Confidence Score
@@ -187,13 +236,19 @@ export default function Home() {
                   </span>
                 </div>
               </div>
+              <button
+                onClick={downloadReport}
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-md shadow-blue-200 hover:bg-blue-700 transition"
+              >
+                <FileDown size={16} /> Download Report
+              </button>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Focus Areas */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm col-span-1 lg:col-span-2">
-              <div className="flex items-center gap-2 mb-6 text-slate-800">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm col-span-1 lg:col-span-2">
+              <div className="flex items-center gap-2 mb-6 text-slate-800 dark:text-slate-200">
                 <Target className="text-blue-500" />
                 <h3 className="font-bold text-lg">Key Focus Areas</h3>
               </div>
@@ -210,8 +265,8 @@ export default function Home() {
             </div>
 
             {/* Evaluation Criteria */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm col-span-1 lg:col-span-1">
-              <div className="flex items-center gap-2 mb-6 text-slate-800">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm col-span-1 lg:col-span-1">
+              <div className="flex items-center gap-2 mb-6 text-slate-800 dark:text-slate-200">
                 <BarChart3 className="text-blue-500" />
                 <h3 className="font-bold text-lg">Evaluation Criteria</h3>
               </div>
@@ -220,14 +275,14 @@ export default function Home() {
                   (criteria: any, idx: number) => (
                     <div key={idx}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-slate-700">
+                        <span className="font-medium text-slate-700 dark:text-slate-300">
                           {criteria.name}
                         </span>
-                        <span className="text-slate-500">
+                        <span className="text-slate-500 dark:text-slate-400">
                           {criteria.percentage}%
                         </span>
                       </div>
-                      <div className="w-full bg-slate-100 rounded-full h-2">
+                      <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
                         <div
                           className="bg-blue-500 h-2 rounded-full"
                           style={{ width: `${criteria.percentage}%` }}
@@ -240,8 +295,8 @@ export default function Home() {
             </div>
 
             {/* Preparation Checklist */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm col-span-1 lg:col-span-2">
-              <div className="flex items-center gap-2 mb-6 text-slate-800">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm col-span-1 lg:col-span-2">
+              <div className="flex items-center gap-2 mb-6 text-slate-800 dark:text-slate-200">
                 <ListChecks className="text-blue-500" />
                 <h3 className="font-bold text-lg">Preparation Checklist</h3>
               </div>
@@ -251,16 +306,16 @@ export default function Home() {
                   .map((item: any, idx: number) => (
                     <div
                       key={idx}
-                      className="flex gap-4 items-start p-4 rounded-xl bg-slate-50 border border-slate-100"
+                      className="flex gap-4 items-start p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700"
                     >
                       <div className="mt-1">
                         <CheckCircle className="text-slate-300" size={20} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-800 mb-1">
+                        <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-1">
                           {item.title}
                         </h4>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
                           {item.description}
                         </p>
                       </div>
@@ -272,15 +327,15 @@ export default function Home() {
             {/* System Design & Coding Focus */}
             {(result.systemDesignFocus?.length > 0 ||
               result.codingFocus?.length > 0) && (
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm col-span-1 lg:col-span-1">
-                <div className="flex items-center gap-2 mb-6 text-slate-800">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm col-span-1 lg:col-span-1">
+              <div className="flex items-center gap-2 mb-6 text-slate-800 dark:text-slate-200">
                   <Cpu className="text-blue-500" />
                   <h3 className="font-bold text-lg">Technical Focus</h3>
                 </div>
 
                 {result.systemDesignFocus?.length > 0 && (
                   <div className="mb-6">
-                    <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+                    <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
                       System Design
                     </h4>
                     <ul className="space-y-2">
@@ -288,7 +343,7 @@ export default function Home() {
                         (item: string, idx: number) => (
                           <li
                             key={idx}
-                            className="text-sm text-slate-600 flex gap-2"
+                            className="text-sm text-slate-600 dark:text-slate-300 flex gap-2"
                           >
                             <span className="text-blue-400">•</span> {item}
                           </li>
@@ -327,7 +382,7 @@ export default function Home() {
       )}
 
       {/* --- FOOTER SECTION --- */}
-      <footer className="pt-20 pb-10 px-8 max-w-7xl mx-auto border-t border-slate-200 mt-20">
+      <footer className="pt-16 sm:pt-20 pb-10 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-200 dark:border-slate-800 mt-16 sm:mt-20">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
           <div className="md:col-span-4">
             <div className="flex items-center gap-2 mb-6">
@@ -353,24 +408,29 @@ export default function Home() {
             <FooterColumn
               title="Platform"
               links={[
-                "Resume Optimizer",
-                "JD Intel",
-                "Referral Network",
-                "Application Tracker",
+                { label: "Resume Optimizer", href: "/resumeoptimizer" },
+                { label: "Referral Network", href: "/finder" },
+                { label: "Application Tracker", href: "/tracker" },
+                { label: "Interview Prep", href: "/interview" },
               ]}
             />
             <FooterColumn
               title="Resources"
               links={[
-                "Career Blog",
-                "Help Center",
-                "Success Stories",
-                "Guides",
+                { label: "Career Blog", href: "/dashboard" },
+                { label: "Help Center", href: "mailto:support@placementgo.in" },
+                { label: "Success Stories", href: "/dashboard" },
+                { label: "Guides", href: "/dashboard" },
               ]}
             />
             <FooterColumn
               title="Company"
-              links={["About Us", "Contact", "Privacy Policy", "Terms"]}
+              links={[
+                { label: "About Us", href: "/" },
+                { label: "Contact", href: "mailto:support@placementgo.in" },
+                { label: "Privacy Policy", href: "mailto:support@placementgo.in" },
+                { label: "Terms", href: "mailto:support@placementgo.in" },
+              ]}
             />
           </div>
         </div>
@@ -380,13 +440,13 @@ export default function Home() {
             © 2026 PlacementGo Inc. All rights reserved.
           </p>
           <div className="flex gap-8 text-sm text-slate-400 font-medium">
-            <Link href="#" className="hover:text-blue-600 transition">
+            <Link href="mailto:support@placementgo.in" className="hover:text-blue-600 transition">
               Privacy
             </Link>
-            <Link href="#" className="hover:text-blue-600 transition">
+            <Link href="mailto:support@placementgo.in" className="hover:text-blue-600 transition">
               Terms
             </Link>
-            <Link href="#" className="hover:text-blue-600 transition">
+            <Link href="mailto:support@placementgo.in" className="hover:text-blue-600 transition">
               Cookies
             </Link>
           </div>
@@ -404,7 +464,7 @@ function SocialIcon({ icon }: { icon: React.ReactNode }) {
   );
 }
 
-function FooterColumn({ title, links }: { title: string; links: string[] }) {
+function FooterColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
   return (
     <div className="flex flex-col gap-4">
       <h4 className="font-bold text-sm text-[#0F172A] uppercase tracking-wider">
@@ -412,12 +472,12 @@ function FooterColumn({ title, links }: { title: string; links: string[] }) {
       </h4>
       <ul className="flex flex-col gap-3">
         {links.map((link) => (
-          <li key={link}>
+          <li key={link.label}>
             <Link
-              href="#"
+              href={link.href}
               className="text-slate-500 hover:text-blue-600 transition-colors text-sm font-medium"
             >
-              {link}
+              {link.label}
             </Link>
           </li>
         ))}

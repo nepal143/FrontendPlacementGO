@@ -14,10 +14,10 @@ interface CreateReferralResponse {
   role: string;
 }
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 export default function ReferralFinder() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, loading: authLoading } = useAuth();
   const router = useRouter();
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
@@ -27,10 +27,10 @@ export default function ReferralFinder() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isLoggedIn) router.push("/login");
-  }, [isLoggedIn]);
+    if (!authLoading && !isLoggedIn) router.push("/login");
+  }, [authLoading, isLoggedIn]);
 
-  if (!isLoggedIn) return null;
+  if (authLoading || !isLoggedIn) return null;
 
   const handleFind = async () => {
     if (!company.trim() || !role.trim()) {
@@ -338,10 +338,10 @@ export default function ReferralFinder() {
         borderTop: "1px solid #e8eaf0", background: "#fff",
         padding: "20px 32px", display: "flex", justifyContent: "space-between", alignItems: "center"
       }}>
-        <span style={{ color: "#9ca3af", fontSize: 13 }}>© 2024 PlacementGo. All rights reserved.</span>
+        <span style={{ color: "#9ca3af", fontSize: 13 }}>© 2026 PlacementGO. All rights reserved.</span>
         <div style={{ display: "flex", gap: 20 }}>
           {["Privacy Policy", "Terms of Service", "Help Center"].map(link => (
-            <a key={link} href="#" style={{ color: "#6b7280", fontSize: 13, textDecoration: "none" }}>
+            <a key={link} href="mailto:support@placementgo.in" style={{ color: "#6b7280", fontSize: 13, textDecoration: "none" }}>
               {link}
             </a>
           ))}

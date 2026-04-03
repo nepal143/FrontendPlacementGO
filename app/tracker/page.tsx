@@ -19,15 +19,15 @@ import {
 } from "lucide-react";
 
 export default function ApplicationsTracker() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, loading: authLoading } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("All Statuses");
 
   useEffect(() => {
-    if (!isLoggedIn) router.push("/login");
-  }, [isLoggedIn]);
+    if (!authLoading && !isLoggedIn) router.push("/login");
+  }, [authLoading, isLoggedIn]);
 
-  if (!isLoggedIn) return null;
+  if (authLoading || !isLoggedIn) return null;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans selection:bg-blue-100">

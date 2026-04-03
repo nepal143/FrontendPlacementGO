@@ -1,0 +1,50 @@
+{
+  "name": "PlacementGO",
+  "short_name": "PlacementGO",
+  "description": "AI-powered career platform for students — resume optimizer, referral finder, application tracker, and interview coach.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563EB",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Resume Optimizer",
+      "short_name": "Resume",
+      "description": "Optimize your resume with AI",
+      "url": "/resumeoptimizer",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Referral Finder",
+      "short_name": "Referrals",
+      "description": "Find referrals at top companies",
+      "url": "/referalfinder",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Job Tracker",
+      "short_name": "Tracker",
+      "description": "Track your job applications",
+      "url": "/tracker",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["education", "productivity", "business"],
+  "lang": "en-US",
+  "dir": "ltr"
+}
