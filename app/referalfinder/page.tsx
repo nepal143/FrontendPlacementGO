@@ -95,17 +95,17 @@ export default function ReferralFinder() {
     : [];
 
   return (
-    <div style={{ fontFamily: "'DM Sans', 'Segoe UI', sans-serif", minHeight: "100vh", background: "#f5f6fa" }}>
+    <div style={{ fontFamily: "'DM Sans', 'Segoe UI', sans-serif", minHeight: "100vh", background: "var(--pg-bg)" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
       <Navbar />
 
       <main style={{ maxWidth: 780, margin: "0 auto", padding: "40px 24px 80px" }}>
 
         <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 30, fontWeight: 700, color: "#1a1d2e", margin: 0, letterSpacing: "-0.5px" }}>
+          <h1 style={{ fontSize: 30, fontWeight: 700, color: "var(--pg-text)", margin: 0, letterSpacing: "-0.5px" }}>
             Referral Finder & Templates
           </h1>
-          <p style={{ color: "#6b7280", marginTop: 8, fontSize: 15, lineHeight: 1.6 }}>
+          <p style={{ color: "var(--pg-muted)", marginTop: 8, fontSize: 15, lineHeight: 1.6 }}>
             Enter the company and role — get a LinkedIn search link and 3 ready-to-send outreach templates.
           </p>
         </div>
@@ -129,14 +129,14 @@ export default function ReferralFinder() {
 
         {!referralData ? (
           <div style={{
-            background: "#fff", borderRadius: 16, padding: 24,
+            background: "var(--pg-card)", borderRadius: 16, padding: 24,
             boxShadow: "0 1px 4px rgba(0,0,0,0.06), 0 4px 20px rgba(0,0,0,0.04)",
-            border: "1px solid #e8eaf0", marginBottom: 20
+            border: "1px solid var(--pg-border)", marginBottom: 20
           }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
               <div>
-                <label style={{ display: "block", fontWeight: 600, fontSize: 14, color: "#374151", marginBottom: 8 }}>
+                <label style={{ display: "block", fontWeight: 600, fontSize: 14, color: "var(--pg-text)", marginBottom: 8 }}>
                   Company Name
                 </label>
                 <input
@@ -145,18 +145,18 @@ export default function ReferralFinder() {
                   onChange={e => setCompany(e.target.value)}
                   placeholder="e.g. Google, Microsoft, Flipkart"
                   style={{
-                    width: "100%", border: "1.5px solid #e5e7eb", borderRadius: 10,
+                    width: "100%", border: "1.5px solid var(--pg-border)", borderRadius: 10,
                     padding: "13px 16px", fontFamily: "inherit", fontSize: 13.5,
-                    color: "#374151", outline: "none", background: "#fafafa",
+                    color: "var(--pg-text)", outline: "none", background: "var(--pg-input)",
                     transition: "border-color 0.2s", boxSizing: "border-box"
                   }}
                   onFocus={e => { e.target.style.borderColor = "#4F6EF7"; }}
-                  onBlur={e => { e.target.style.borderColor = "#e5e7eb"; }}
+                  onBlur={e => { e.target.style.borderColor = "var(--pg-border)"; }}
                 />
               </div>
 
               <div>
-                <label style={{ display: "block", fontWeight: 600, fontSize: 14, color: "#374151", marginBottom: 8 }}>
+                <label style={{ display: "block", fontWeight: 600, fontSize: 14, color: "var(--pg-text)", marginBottom: 8 }}>
                   Job Role
                 </label>
                 <input
@@ -166,13 +166,13 @@ export default function ReferralFinder() {
                   placeholder="e.g. Frontend Engineer, Product Manager"
                   onKeyDown={e => { if (e.key === "Enter") handleFind(); }}
                   style={{
-                    width: "100%", border: "1.5px solid #e5e7eb", borderRadius: 10,
+                    width: "100%", border: "1.5px solid var(--pg-border)", borderRadius: 10,
                     padding: "13px 16px", fontFamily: "inherit", fontSize: 13.5,
-                    color: "#374151", outline: "none", background: "#fafafa",
+                    color: "var(--pg-text)", outline: "none", background: "var(--pg-input)",
                     transition: "border-color 0.2s", boxSizing: "border-box"
                   }}
                   onFocus={e => { e.target.style.borderColor = "#4F6EF7"; }}
-                  onBlur={e => { e.target.style.borderColor = "#e5e7eb"; }}
+                  onBlur={e => { e.target.style.borderColor = "var(--pg-border)"; }}
                 />
               </div>
 
@@ -197,26 +197,26 @@ export default function ReferralFinder() {
 
             {/* Job Info Banner */}
             <div style={{
-              background: "#fff", borderRadius: 16, padding: 20,
-              boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #e8eaf0",
+              background: "var(--pg-card)", borderRadius: 16, padding: 20,
+              boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid var(--pg-border)",
               marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between"
             }}>
               <div>
-                <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "var(--pg-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   Searching for
                 </p>
-                <p style={{ margin: "4px 0 0", fontSize: 18, fontWeight: 700, color: "#1a1d2e" }}>
+                <p style={{ margin: "4px 0 0", fontSize: 18, fontWeight: 700, color: "var(--pg-text)" }}>
                   {referralData.role}{" "}
-                  <span style={{ color: "#9ca3af", fontWeight: 400 }}>at</span>{" "}
+                  <span style={{ color: "var(--pg-muted)", fontWeight: 400 }}>at</span>{" "}
                   {referralData.company}
                 </p>
               </div>
               <button
                 onClick={handleReset}
                 style={{
-                  background: "none", border: "1.5px solid #e5e7eb", borderRadius: 8,
+                  background: "none", border: "1.5px solid var(--pg-border)", borderRadius: 8,
                   padding: "7px 14px", fontFamily: "inherit", fontSize: 13,
-                  fontWeight: 600, cursor: "pointer", color: "#6b7280"
+                  fontWeight: 600, cursor: "pointer", color: "var(--pg-muted)"
                 }}
               >
                 Change
@@ -251,7 +251,7 @@ export default function ReferralFinder() {
                 rel="noopener noreferrer"
                 style={{
                   flexShrink: 0,
-                  background: "#fff",
+                  background: "var(--pg-card)",
                   color: "#0a66c2",
                   fontWeight: 700,
                   fontSize: 14,
@@ -268,7 +268,7 @@ export default function ReferralFinder() {
 
             {/* Templates */}
             <div style={{ marginBottom: 20 }}>
-              <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 600, color: "var(--pg-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Step 2 — Copy a Template
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -276,23 +276,23 @@ export default function ReferralFinder() {
                   <div
                     key={t.id}
                     style={{
-                      background: "#fff", borderRadius: 14, padding: 20,
-                      boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #e8eaf0"
+                      background: "var(--pg-card)", borderRadius: 14, padding: 20,
+                      boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid var(--pg-border)"
                     }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                         <span style={{ fontSize: 16 }}>{t.icon}</span>
-                        <span style={{ fontWeight: 700, fontSize: 15, color: "#1a1d2e" }}>{t.title}</span>
+                        <span style={{ fontWeight: 700, fontSize: 15, color: "var(--pg-text)" }}>{t.title}</span>
                       </div>
                       <button
                         onClick={() => handleCopy(t.id, t.body)}
                         style={{
-                          background: copied === t.id ? "#ecfdf5" : "#f9fafb",
-                          border: `1.5px solid ${copied === t.id ? "#6ee7b7" : "#e5e7eb"}`,
+                          background: copied === t.id ? "#ecfdf5" : "var(--pg-chip)",
+                          border: `1.5px solid ${copied === t.id ? "#6ee7b7" : "var(--pg-border)"}`,
                           borderRadius: 8, padding: "5px 12px", fontFamily: "inherit",
                           fontSize: 12.5, fontWeight: 600, cursor: "pointer",
-                          color: copied === t.id ? "#059669" : "#374151",
+                          color: copied === t.id ? "#059669" : "var(--pg-text)",
                           display: "flex", alignItems: "center", gap: 5, transition: "all 0.2s"
                         }}
                       >
@@ -300,10 +300,10 @@ export default function ReferralFinder() {
                       </button>
                     </div>
                     <pre style={{
-                      margin: 0, color: "#374151", fontSize: 13.5,
+                      margin: 0, color: "var(--pg-text)", fontSize: 13.5,
                       lineHeight: 1.7, whiteSpace: "pre-wrap", fontFamily: "inherit",
-                      background: "#fafafa", borderRadius: 10,
-                      padding: "14px 16px", border: "1px solid #f3f4f6"
+                      background: "var(--pg-input)", borderRadius: 10,
+                      padding: "14px 16px", border: "1px solid var(--pg-border)"
                     }}>
                       {t.body}
                     </pre>
@@ -324,7 +324,7 @@ export default function ReferralFinder() {
               }}>
                 Pro Tip
               </span>
-              <p style={{ margin: 0, color: "#92400e", fontSize: 13.5, lineHeight: 1.6 }}>
+              <p style={{ margin: 0, color: "var(--pg-text)", fontSize: 13.5, lineHeight: 1.6 }}>
                 Personalizing your message with a specific project the employee worked on increases your response rate by over{" "}
                 <strong>45%</strong>. Check their recent LinkedIn activity before sending!
               </p>
@@ -335,13 +335,13 @@ export default function ReferralFinder() {
       </main>
 
       <footer style={{
-        borderTop: "1px solid #e8eaf0", background: "#fff",
+        borderTop: "1px solid var(--pg-border)", background: "var(--pg-card)",
         padding: "20px 32px", display: "flex", justifyContent: "space-between", alignItems: "center"
       }}>
-        <span style={{ color: "#9ca3af", fontSize: 13 }}>© 2026 PlacementGO. All rights reserved.</span>
+        <span style={{ color: "var(--pg-muted)", fontSize: 13 }}>© 2026 PlacementGO. All rights reserved.</span>
         <div style={{ display: "flex", gap: 20 }}>
           {["Privacy Policy", "Terms of Service", "Help Center"].map(link => (
-            <a key={link} href="mailto:support@placementgo.in" style={{ color: "#6b7280", fontSize: 13, textDecoration: "none" }}>
+            <a key={link} href="mailto:support@placementgo.in" style={{ color: "var(--pg-muted)", fontSize: 13, textDecoration: "none" }}>
               {link}
             </a>
           ))}

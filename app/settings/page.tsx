@@ -72,12 +72,12 @@ const Toggle = ({ on, onChange }: { on: boolean; onChange: () => void }) => (
     onClick={onChange}
     style={{
       width: 44, height: 24, borderRadius: 12, cursor: "pointer",
-      background: on ? "#3b5bdb" : "#e8ecf4",
+      background: on ? "#3b5bdb" : "var(--pg-border)",
       position: "relative", transition: "background 0.2s", flexShrink: 0,
     }}
   >
     <div style={{
-      width: 18, height: 18, borderRadius: "50%", background: "white",
+      width: 18, height: 18, borderRadius: "50%", background: "var(--pg-card)",
       position: "absolute", top: 3,
       left: on ? 23 : 3,
       transition: "left 0.2s",
@@ -126,7 +126,7 @@ const SectionTab = ({ label, active, onClick }: { label: string; active: boolean
     onClick={onClick}
     style={{
       padding: "8px 16px", borderRadius: 20, border: "none",
-      background: active ? "#3b5bdb" : "#f0f2f7",
+      background: active ? "#3b5bdb" : "var(--pg-chip)",
       color: active ? "white" : "#7b8299",
       fontSize: 13, fontWeight: 600, cursor: "pointer",
       fontFamily: "inherit", whiteSpace: "nowrap", flexShrink: 0,
@@ -139,7 +139,7 @@ const SectionTab = ({ label, active, onClick }: { label: string; active: boolean
 
 const Card = ({ children, style = {} }: { children: React.ReactNode; style?: React.CSSProperties }) => (
   <div style={{
-    background: "white", border: "1px solid #e8ecf4",
+    background: "var(--pg-card)", border: "1px solid var(--pg-border)",
     borderRadius: 14, padding: "20px 20px", marginBottom: 16, ...style,
   }}>
     {children}
@@ -156,8 +156,8 @@ const SettingRow = ({ label, sub, right, border = true }: { label: string; sub?:
     gap: 12,
   }}>
     <div style={{ minWidth: 0 }}>
-      <div style={{ fontSize: 13.5, fontWeight: 600, color: "#1a1d2e" }}>{label}</div>
-      {sub && <div style={{ fontSize: 12, color: "#7b8299", marginTop: 2, lineHeight: 1.4 }}>{sub}</div>}
+      <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--pg-text)" }}>{label}</div>
+      {sub && <div style={{ fontSize: 12, color: "var(--pg-muted)", marginTop: 2, lineHeight: 1.4 }}>{sub}</div>}
     </div>
     <div style={{ flexShrink: 0 }}>{right}</div>
   </div>
@@ -167,8 +167,8 @@ const SettingRow = ({ label, sub, right, border = true }: { label: string; sub?:
 
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "10px 14px", fontSize: 13,
-  border: "1.5px solid #e8ecf4", borderRadius: 8, outline: "none",
-  fontFamily: "inherit", boxSizing: "border-box", background: "white", color: "#1a1d2e",
+  border: "1.5px solid var(--pg-border)", borderRadius: 8, outline: "none",
+  fontFamily: "inherit", boxSizing: "border-box", background: "var(--pg-card)", color: "var(--pg-text)",
 };
 
 // ─── Save Button ──────────────────────────────────────────────────────────────
@@ -215,7 +215,7 @@ const ProfileSection = ({ userEmail, showToast }: { userEmail: string; showToast
         }}>{userInitials}</div>
         <div>
           <div style={{ fontSize: 14, fontWeight: 700 }}>{userEmail || "User"}</div>
-          <div style={{ fontSize: 12, color: "#7b8299", marginTop: 2 }}>Student Plan · Free tier</div>
+          <div style={{ fontSize: 12, color: "var(--pg-muted)", marginTop: 2 }}>Student Plan · Free tier</div>
         </div>
       </div>
 
@@ -228,14 +228,14 @@ const ProfileSection = ({ userEmail, showToast }: { userEmail: string; showToast
           { label: "Graduation Year", val: gradYear, set: setGradYear, ph: "e.g. 2026" },
         ].map(f => (
           <div key={f.label}>
-            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#4a4f6b", marginBottom: 5 }}>{f.label}</label>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--pg-label)", marginBottom: 5 }}>{f.label}</label>
             <input value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph} style={inputStyle} />
           </div>
         ))}
         <div>
-          <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#4a4f6b", marginBottom: 5 }}>Email</label>
-          <input value={userEmail || ""} disabled style={{ ...inputStyle, background: "#f9fafb", color: "#adb5bd", cursor: "not-allowed" }} />
-          <div style={{ fontSize: 11, color: "#adb5bd", marginTop: 3 }}>Email cannot be changed.</div>
+          <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--pg-label)", marginBottom: 5 }}>Email</label>
+          <input value={userEmail || ""} disabled style={{ ...inputStyle, background: "var(--pg-chip)", color: "var(--pg-muted)", cursor: "not-allowed" }} />
+          <div style={{ fontSize: 11, color: "var(--pg-muted)", marginTop: 3 }}>Email cannot be changed.</div>
         </div>
       </div>
       <SaveBtn onClick={save} loading={saving} label="Save Profile" />
@@ -258,38 +258,38 @@ const GoalSection = ({ showToast }: { showToast: (m: string) => void }) => {
 
   return (
     <Card>
-      <div style={{ fontSize: 13, color: "#7b8299", marginBottom: 20, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 13, color: "var(--pg-muted)", marginBottom: 20, lineHeight: 1.5 }}>
         Set your monthly application target. Your dashboard progress bar uses this number.
       </div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, margin: "8px 0 20px" }}>
         <button
           onClick={() => setGoal(g => Math.max(1, g - 1))}
           style={{
-            width: 40, height: 40, borderRadius: 10, border: "1.5px solid #e8ecf4",
-            background: "white", fontSize: 20, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center", color: "#1a1d2e",
+            width: 40, height: 40, borderRadius: 10, border: "1.5px solid var(--pg-border)",
+            background: "var(--pg-card)", fontSize: 20, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", color: "var(--pg-text)",
           }}
         >−</button>
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: 42, fontWeight: 900, color: "#3b5bdb", lineHeight: 1 }}>{goal}</div>
-          <div style={{ fontSize: 12, color: "#7b8299", marginTop: 4 }}>apps / month</div>
+          <div style={{ fontSize: 12, color: "var(--pg-muted)", marginTop: 4 }}>apps / month</div>
         </div>
         <button
           onClick={() => setGoal(g => Math.min(100, g + 1))}
           style={{
-            width: 40, height: 40, borderRadius: 10, border: "1.5px solid #e8ecf4",
-            background: "white", fontSize: 20, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center", color: "#1a1d2e",
+            width: 40, height: 40, borderRadius: 10, border: "1.5px solid var(--pg-border)",
+            background: "var(--pg-card)", fontSize: 20, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", color: "var(--pg-text)",
           }}
         >+</button>
       </div>
       {/* mini progress preview */}
-      <div style={{ background: "#f4f6fb", borderRadius: 8, padding: "12px 14px", marginBottom: 4 }}>
-        <div style={{ fontSize: 12, color: "#7b8299", marginBottom: 6 }}>Preview in dashboard</div>
-        <div style={{ height: 6, background: "#e8ecf4", borderRadius: 10, overflow: "hidden" }}>
+      <div style={{ background: "var(--pg-bg)", borderRadius: 8, padding: "12px 14px", marginBottom: 4 }}>
+        <div style={{ fontSize: 12, color: "var(--pg-muted)", marginBottom: 6 }}>Preview in dashboard</div>
+        <div style={{ height: 6, background: "var(--pg-border)", borderRadius: 10, overflow: "hidden" }}>
           <div style={{ height: "100%", width: "30%", background: "#3b5bdb", borderRadius: 10 }} />
         </div>
-        <div style={{ fontSize: 11, color: "#adb5bd", marginTop: 5 }}>3 of {goal} applications</div>
+        <div style={{ fontSize: 11, color: "var(--pg-muted)", marginTop: 5 }}>3 of {goal} applications</div>
       </div>
       <SaveBtn onClick={save} loading={false} label="Save Goal" />
     </Card>
@@ -357,7 +357,7 @@ const SecuritySection = ({ showToast }: { showToast: (m: string) => void }) => {
           { label: "Confirm New Password", key: "confirm", ph: "Repeat new password" },
         ].map(f => (
           <div key={f.key}>
-            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#4a4f6b", marginBottom: 5 }}>{f.label}</label>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--pg-label)", marginBottom: 5 }}>{f.label}</label>
             <input
               type="password" placeholder={f.ph}
               value={(pw as Record<string, string>)[f.key]}
@@ -381,7 +381,7 @@ const DangerSection = ({ logout }: { logout: () => void }) => {
   return (
     <>
       <Card style={{ border: "1px solid #ffd0d0" }}>
-        <div style={{ fontSize: 13, color: "#7b8299", marginBottom: 14, lineHeight: 1.5 }}>
+        <div style={{ fontSize: 13, color: "var(--pg-muted)", marginBottom: 14, lineHeight: 1.5 }}>
           Permanently delete your account and all data. This cannot be undone.
         </div>
         <button
@@ -409,15 +409,15 @@ const DangerSection = ({ logout }: { logout: () => void }) => {
           }}
         >
           <div style={{
-            background: "white", borderRadius: 16, padding: 24,
+            background: "var(--pg-card)", borderRadius: 16, padding: 24,
             width: "100%", maxWidth: 400,
             boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
           }}>
             <div style={{ fontSize: 17, fontWeight: 700, color: "#e03131", marginBottom: 8 }}>Delete Account?</div>
-            <div style={{ fontSize: 13, color: "#7b8299", marginBottom: 18, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 13, color: "var(--pg-muted)", marginBottom: 18, lineHeight: 1.6 }}>
               This will permanently delete your account, all applications, and resumes. <strong>This cannot be undone.</strong>
             </div>
-            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#4a4f6b", marginBottom: 6 }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--pg-label)", marginBottom: 6 }}>
               Type <strong>DELETE</strong> to confirm
             </label>
             <input
@@ -429,7 +429,7 @@ const DangerSection = ({ logout }: { logout: () => void }) => {
             <div style={{ display: "flex", gap: 10 }}>
               <button
                 onClick={() => { setShowModal(false); setConfirmText(""); }}
-                style={{ flex: 1, padding: "11px 0", background: "#f4f6fb", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ flex: 1, padding: "11px 0", background: "var(--pg-bg)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
               >Cancel</button>
               <button
                 disabled={confirmText !== "DELETE"}
@@ -488,12 +488,12 @@ export default function SettingsPage() {
   // ── MOBILE LAYOUT ──────────────────────────────────────────────────────────
   if (isMobile) {
     return (
-      <div style={{ minHeight: "100vh", background: "#f4f6fb", fontFamily: "'DM Sans', sans-serif", color: "#1a1d2e", paddingBottom: 80 }}>
+      <div style={{ minHeight: "100vh", background: "var(--pg-bg)", fontFamily: "'DM Sans', sans-serif", color: "var(--pg-text)", paddingBottom: 80 }}>
 
         {/* Mobile Top Header */}
         <div style={{
           position: "sticky", top: 0, zIndex: 50,
-          background: "white", borderBottom: "1px solid #e8ecf4",
+          background: "var(--pg-card)", borderBottom: "1px solid var(--pg-border)",
           padding: "14px 16px 0",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
@@ -502,7 +502,7 @@ export default function SettingsPage() {
               background: "linear-gradient(135deg, #3b5bdb, #748ffc)",
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14,
             }}>🚀</div>
-            <span style={{ fontWeight: 800, fontSize: 15, color: "#1a1d2e" }}>Settings</span>
+            <span style={{ fontWeight: 800, fontSize: 15, color: "var(--pg-text)" }}>Settings</span>
           </div>
 
           {/* Section Tabs — horizontal scroll */}
@@ -518,7 +518,7 @@ export default function SettingsPage() {
           <div style={{ fontSize: 18, fontWeight: 800 }}>
             {sections.find(s => s.key === activeSection)?.label}
           </div>
-          <div style={{ fontSize: 12.5, color: "#7b8299", marginTop: 2 }}>
+          <div style={{ fontSize: 12.5, color: "var(--pg-muted)", marginTop: 2 }}>
             {activeSection === "profile" && "Update your personal information"}
             {activeSection === "goal" && "Set your monthly application target"}
             {activeSection === "notifications" && "Manage what updates you receive"}
@@ -535,7 +535,7 @@ export default function SettingsPage() {
         {/* Mobile Bottom Nav */}
         <div style={{
           position: "fixed", bottom: 0, left: 0, right: 0,
-          background: "white", borderTop: "1px solid #e8ecf4",
+          background: "var(--pg-card)", borderTop: "1px solid var(--pg-border)",
           display: "flex", alignItems: "center", justifyContent: "space-around",
           padding: "8px 0 12px", zIndex: 100,
         }}>
@@ -570,16 +570,16 @@ export default function SettingsPage() {
 
   // ── DESKTOP LAYOUT ─────────────────────────────────────────────────────────
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f4f6fb", fontFamily: "'DM Sans', sans-serif", color: "#1a1d2e" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "var(--pg-bg)", fontFamily: "'DM Sans', sans-serif", color: "var(--pg-text)" }}>
 
       {/* Desktop Sidebar */}
       <aside style={{
-        width: 220, background: "white", borderRight: "1px solid #e8ecf4",
+        width: 220, background: "var(--pg-card)", borderRight: "1px solid #e8ecf4",
         display: "flex", flexDirection: "column", padding: "24px 0",
         position: "fixed", height: "100vh", zIndex: 10,
       }}>
         <Link href="/" style={{ textDecoration: "none" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 20px 28px", borderBottom: "1px solid #e8ecf4" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 20px 28px", borderBottom: "1px solid var(--pg-border)" }}>
             <div style={{
               width: 36, height: 36, borderRadius: 10,
               background: "linear-gradient(135deg, #3b5bdb, #748ffc)",
@@ -588,14 +588,14 @@ export default function SettingsPage() {
             <span style={{ fontWeight: 800, fontSize: 15 }}>PlacementGo</span>
           </div>
         </Link>
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: "#7b8299", padding: "20px 20px 8px" }}>Menu</span>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: "var(--pg-muted)", padding: "20px 20px 8px" }}>Menu</span>
         <NavItem icon={<DashboardIcon />} label="Dashboard" href="/dashboard" />
         <NavItem icon={<DocIcon />} label="Resume Optimizer" href="/resumeoptimizer" />
         <NavItem icon={<UsersIcon />} label="Referral Finder" href="/referalfinder" />
         <NavItem icon={<CalendarIcon />} label="Interview Guide" href="/interview" />
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: "#7b8299", padding: "20px 20px 8px" }}>Account</span>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: "var(--pg-muted)", padding: "20px 20px 8px" }}>Account</span>
         <NavItem icon={<SettingsIcon />} label="Settings" href="/settings" active />
-        <div style={{ marginTop: "auto", padding: 16, borderTop: "1px solid #e8ecf4" }}>
+        <div style={{ marginTop: "auto", padding: 16, borderTop: "1px solid var(--pg-border)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 10, borderRadius: 10 }}>
             <div style={{
               width: 36, height: 36, borderRadius: "50%",
@@ -605,7 +605,7 @@ export default function SettingsPage() {
             }}>{userInitials}</div>
             <div style={{ overflow: "hidden" }}>
               <div style={{ fontSize: 12, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userEmail || "User"}</div>
-              <div style={{ fontSize: 11, color: "#7b8299" }}>Student Plan</div>
+              <div style={{ fontSize: 11, color: "var(--pg-muted)" }}>Student Plan</div>
             </div>
           </div>
           <button onClick={logout} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", color: "#e03131", fontSize: 13, fontWeight: 500, cursor: "pointer", borderRadius: 8, background: "none", border: "none", width: "100%", fontFamily: "inherit" }}>
@@ -618,7 +618,7 @@ export default function SettingsPage() {
       <main style={{ marginLeft: 220, flex: 1, padding: "32px 40px 60px", maxWidth: "calc(100vw - 220px)" }}>
         <div style={{ marginBottom: 28 }}>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>Settings</h1>
-          <p style={{ fontSize: 13.5, color: "#7b8299", marginTop: 4 }}>Manage your account, preferences, and notifications.</p>
+          <p style={{ fontSize: 13.5, color: "var(--pg-muted)", marginTop: 4 }}>Manage your account, preferences, and notifications.</p>
         </div>
 
         {/* Desktop: two-col layout — left nav + right content */}
@@ -652,7 +652,7 @@ export default function SettingsPage() {
             <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 4 }}>
               {sections.find(s => s.key === activeSection)?.label}
             </div>
-            <div style={{ fontSize: 13, color: "#7b8299", marginBottom: 18 }}>
+            <div style={{ fontSize: 13, color: "var(--pg-muted)", marginBottom: 18 }}>
               {activeSection === "profile" && "Update your personal and academic information."}
               {activeSection === "goal" && "Set your monthly application target to track progress."}
               {activeSection === "notifications" && "Choose what updates you want to receive."}

@@ -30,9 +30,9 @@ export default function ApplicationsTracker() {
   if (authLoading || !isLoggedIn) return null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans selection:bg-blue-100">
+    <div className="min-h-screen bg-[var(--pg-bg)] text-[var(--pg-text)] font-sans selection:bg-blue-100">
       {/* --- TOP NAVIGATION --- */}
-      <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <nav className="bg-[var(--pg-card)] border-b border-[var(--pg-border)] sticky top-0 z-50">
         <Navbar />
       </nav>
 
@@ -43,22 +43,22 @@ export default function ApplicationsTracker() {
             <h1 className="text-4xl font-black mb-3 tracking-tight">
               Job Applications
             </h1>
-            <p className="text-slate-500 font-medium max-w-xl">
+            <p className="text-[var(--pg-muted)] font-medium max-w-xl">
               Track and manage your placement process across all companies in
               one centralized dashboard.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 flex gap-8 shadow-sm">
+            <div className="bg-[var(--pg-card)] border border-[var(--pg-border)] rounded-2xl p-4 flex gap-8 shadow-sm">
               <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                <p className="text-[10px] font-black text-[var(--pg-muted)] uppercase tracking-widest mb-1">
                   Active
                 </p>
                 <p className="text-xl font-black text-blue-600">24</p>
               </div>
-              <div className="w-px h-8 bg-slate-100 self-center" />
+              <div className="w-px h-8 bg-[var(--pg-chip)] self-center" />
               <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                <p className="text-[10px] font-black text-[var(--pg-muted)] uppercase tracking-widest mb-1">
                   Interviews
                 </p>
                 <p className="text-xl font-black text-orange-500">5</p>
@@ -72,18 +72,18 @@ export default function ApplicationsTracker() {
         </div>
 
         {/* --- TABLE CARD --- */}
-        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-[var(--pg-card)] rounded-[2rem] border border-[var(--pg-border)] shadow-sm overflow-hidden">
           {/* Table Filters */}
-          <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="flex bg-slate-50 p-1 rounded-xl">
+          <div className="p-6 border-b border-[var(--pg-border)] flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex bg-[var(--pg-chip)] p-1 rounded-xl">
               {["All Statuses", "Applied", "Interview", "Offer"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                     activeTab === tab
-                      ? "bg-white text-blue-600 shadow-sm"
-                      : "text-slate-500 hover:text-slate-700"
+                      ? "bg-[var(--pg-card)] text-blue-600 shadow-sm"
+                      : "text-[var(--pg-muted)] hover:text-[var(--pg-text)]"
                   }`}
                 >
                   {tab}
@@ -92,10 +92,10 @@ export default function ApplicationsTracker() {
             </div>
 
             <div className="flex items-center gap-2">
-              <button className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50">
+              <button className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-[var(--pg-muted)] border border-[var(--pg-border)] rounded-xl hover:bg-[var(--pg-chip)]">
                 <Filter size={14} /> Filter
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50">
+              <button className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-[var(--pg-muted)] border border-[var(--pg-border)] rounded-xl hover:bg-[var(--pg-chip)]">
                 <Download size={14} /> Export
               </button>
             </div>
@@ -105,7 +105,7 @@ export default function ApplicationsTracker() {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100">
+                <tr className="bg-slate-50/50 text-[10px] font-black text-[var(--pg-muted)] uppercase tracking-[0.2em] border-b border-[var(--pg-border)]">
                   <th className="px-8 py-4">Company</th>
                   <th className="px-8 py-4">Role</th>
                   <th className="px-8 py-4">Date Applied</th>
@@ -158,14 +158,14 @@ export default function ApplicationsTracker() {
 
           {/* Pagination */}
           <div className="p-6 border-t border-slate-50 bg-slate-50/30 flex justify-between items-center">
-            <p className="text-xs font-bold text-slate-400">
+            <p className="text-xs font-bold text-[var(--pg-muted)]">
               Showing 4 of 24 applications
             </p>
             <div className="flex gap-2">
-              <button className="p-2 border border-slate-200 rounded-lg text-slate-400 hover:bg-white transition-colors">
+              <button className="p-2 border border-[var(--pg-border)] rounded-lg text-[var(--pg-muted)] hover:bg-[var(--pg-card)] transition-colors">
                 <ChevronLeft size={16} />
               </button>
-              <button className="p-2 border border-slate-200 rounded-lg text-slate-400 hover:bg-white transition-colors">
+              <button className="p-2 border border-[var(--pg-border)] rounded-lg text-[var(--pg-muted)] hover:bg-[var(--pg-card)] transition-colors">
                 <ChevronRight size={16} />
               </button>
             </div>
@@ -207,17 +207,17 @@ function ApplicationRow({
           <div className="w-10 h-10 bg-[#0F172A] text-white rounded-xl flex items-center justify-center font-bold text-sm">
             {logo}
           </div>
-          <span className="font-bold text-slate-900">{company}</span>
+          <span className="font-bold text-[var(--pg-text)]">{company}</span>
         </div>
       </td>
       <td className="px-8 py-5">
-        <p className="text-sm font-bold text-slate-700">{role}</p>
+        <p className="text-sm font-bold text-[var(--pg-text)]">{role}</p>
       </td>
       <td className="px-8 py-5">
-        <p className="text-xs font-medium text-slate-500">{date}</p>
+        <p className="text-xs font-medium text-[var(--pg-muted)]">{date}</p>
       </td>
       <td className="px-8 py-5">
-        <span className="bg-slate-100 border border-slate-200 text-slate-600 px-3 py-1 rounded-lg text-[10px] font-bold">
+        <span className="bg-[var(--pg-chip)] border border-[var(--pg-border)] text-[var(--pg-muted)] px-3 py-1 rounded-lg text-[10px] font-bold">
           {resume}
         </span>
       </td>
@@ -246,7 +246,7 @@ function ApplicationRow({
         </div>
       </td>
       <td className="px-8 py-5 text-center">
-        <button className="text-slate-400 hover:text-slate-600 p-2 hover:bg-white hover:shadow-sm rounded-lg transition-all">
+        <button className="text-[var(--pg-muted)] hover:text-[var(--pg-muted)] p-2 hover:bg-[var(--pg-card)] hover:shadow-sm rounded-lg transition-all">
           <MoreHorizontal size={18} />
         </button>
       </td>
