@@ -92,7 +92,7 @@ const featureListJsonLd = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans">
+    <div className="min-h-screen bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-sans">
       {/* Structured data for rich Google results */}
       <script
         type="application/ld+json"
@@ -107,7 +107,7 @@ export default function Home() {
       <Navbar />
 
       {/* --- HERO SECTION --- */}
-      <header className="relative pt-16 pb-24 px-8 max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+      <header className="relative pt-10 sm:pt-16 pb-16 sm:pb-24 px-4 sm:px-8 max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
         <div>
           <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full mb-6">
             <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
@@ -115,7 +115,7 @@ export default function Home() {
               New: AI Interview Coach
             </span>
           </div>
-          <h1 className="text-6xl font-extrabold leading-[1.1] mb-6">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] mb-6">
             Optimize Your Resume. <br />
             <span className="text-blue-600">Get Referrals.</span> <br />
             Track Everything.
@@ -192,8 +192,8 @@ export default function Home() {
       </header>
 
       {/* --- LOGO CLOUD --- */}
-      <section className="py-20 border-y border-slate-100">
-        <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-10">
+      <section className="py-20 border-y border-slate-100 dark:border-slate-800">
+        <p className="text-center text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-10">
           Our alumni work at world-class companies
         </p>
         <div className="flex flex-wrap justify-center items-center gap-12 px-8 opacity-40 grayscale">
@@ -208,7 +208,7 @@ export default function Home() {
       {/* --- FEATURES SECTION --- */}
       <section
         id="features"
-        className="py-24 px-8 max-w-7xl mx-auto text-center"
+        className="py-16 sm:py-24 px-4 sm:px-8 max-w-7xl mx-auto text-center"
       >
         <span className="text-blue-600 font-bold uppercase tracking-widest text-xs">
           Powerful Features
@@ -256,9 +256,9 @@ export default function Home() {
       </section>
 
       {/* --- PROCESS SECTION --- */}
-      <section className="py-24 bg-slate-50/50">
+      <section className="py-16 sm:py-24 bg-slate-50/50 dark:bg-slate-800/30">
         <div className="max-w-7xl mx-auto px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-10 sm:mb-16">
             <div className="text-left">
               <span className="text-blue-600 font-bold uppercase tracking-widest text-xs">
                 The Process
@@ -296,7 +296,7 @@ export default function Home() {
       </section>
 
       {/* --- TESTIMONIAL SECTION --- */}
-      <section className="py-24 px-8 max-w-7xl mx-auto">
+      <section className="py-16 sm:py-24 px-4 sm:px-8 max-w-7xl mx-auto">
         <div className="bg-blue-600 rounded-3xl p-10 md:p-16 text-white flex flex-col md:flex-row items-center gap-10">
           <Image
             src="https://i.pravatar.cc/150?u=sarah"
@@ -354,7 +354,7 @@ export default function Home() {
       </section>
 
       {/* --- FOOTER SECTION --- */}
-      <footer className="pt-20 pb-10 px-8 max-w-7xl mx-auto">
+      <footer className="pt-16 sm:pt-20 pb-10 px-4 sm:px-8 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
           {/* Brand Info */}
           <div className="md:col-span-4">
@@ -362,7 +362,7 @@ export default function Home() {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">P</span>
               </div>
-              <span className="text-xl font-bold tracking-tight text-[#0F172A]">
+              <span className="text-xl font-bold tracking-tight text-[#0F172A] dark:text-white">
                 PlacementGo
               </span>
             </div>
@@ -410,8 +410,8 @@ export default function Home() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-slate-400 text-sm">
+        <div className="pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-slate-400 dark:text-slate-500 text-sm">
             © 2026 PlacementGO. All rights reserved.
           </p>
           <div className="flex gap-8 text-sm text-slate-400 font-medium">
@@ -443,7 +443,7 @@ function FeatureCard({
   features: string[];
 }) {
   return (
-    <div className="p-8 rounded-2xl border border-slate-100 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50 transition group">
+    <div className="p-8 rounded-2xl border border-slate-100 dark:border-slate-700 dark:bg-slate-800/50 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50 transition group">
       <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
         {icon}
       </div>
@@ -452,7 +452,7 @@ function FeatureCard({
         {features.map((f) => (
           <li
             key={f}
-            className="text-slate-500 text-sm flex items-center gap-2"
+            className="text-slate-500 dark:text-slate-400 text-sm flex items-center gap-2"
           >
             <span className="text-blue-400">✔</span> {f}
           </li>
@@ -492,7 +492,7 @@ function ProcessStep({
 
 function SocialIcon({ icon }: { icon: React.ReactNode }) {
   return (
-    <button className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors border border-slate-100">
+    <button className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors border border-slate-100 dark:border-slate-700">
       {icon}
     </button>
   );
@@ -501,7 +501,7 @@ function SocialIcon({ icon }: { icon: React.ReactNode }) {
 function FooterColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
   return (
     <div className="flex flex-col gap-4">
-      <h4 className="font-bold text-sm text-[#0F172A] uppercase tracking-wider">
+      <h4 className="font-bold text-sm text-[#0F172A] dark:text-slate-300 uppercase tracking-wider">
         {title}
       </h4>
       <ul className="flex flex-col gap-3">

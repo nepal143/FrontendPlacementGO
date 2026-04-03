@@ -117,11 +117,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-sans">
       <Navbar />
 
       {/* --- HERO / INPUT SECTION --- */}
-      <header className="relative pt-16 pb-12 px-8 max-w-7xl mx-auto">
+      <header className="relative pt-10 sm:pt-16 pb-8 sm:pb-12 px-4 sm:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full mb-6">
             <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
@@ -129,7 +129,7 @@ export default function Home() {
               AI Powered JD Intel
             </span>
           </div>
-          <h1 className="text-5xl font-extrabold leading-[1.1] mb-6">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.1] mb-6">
             Analyze the Job.{" "}
             <span className="text-blue-600">Crack the Interview.</span>
           </h1>
@@ -140,11 +140,11 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/50 border border-slate-100 max-w-4xl mx-auto relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 max-w-4xl mx-auto relative overflow-hidden">
           <form onSubmit={analyzeJD} className="space-y-6 relative z-10">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                   Company
                 </label>
                 <input
@@ -154,11 +154,11 @@ export default function Home() {
                   onChange={handleInputChange}
                   placeholder="e.g. Google"
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                   Role
                 </label>
                 <input
@@ -168,12 +168,12 @@ export default function Home() {
                   onChange={handleInputChange}
                   placeholder="e.g. Software Engineer"
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                 Job Description
               </label>
               <textarea
@@ -183,7 +183,7 @@ export default function Home() {
                 placeholder="Paste the full job description here..."
                 required
                 rows={6}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
               />
             </div>
             <button
@@ -214,16 +214,16 @@ export default function Home() {
 
       {/* --- RESULTS SECTION --- */}
       {result && (
-        <section className="py-12 px-8 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 border-b border-slate-200 pb-6">
+        <section className="py-8 sm:py-12 px-4 sm:px-8 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 sm:mb-10 border-b border-slate-200 dark:border-slate-700 pb-6">
             <div>
-              <h2 className="text-3xl font-extrabold mb-2 text-slate-900 flex items-center gap-3">
+              <h2 className="text-2xl sm:text-3xl font-extrabold mb-2 text-slate-900 dark:text-white flex items-center gap-3 flex-wrap">
                 {result.company} - {result.role}
                 <span className="text-sm px-3 py-1 bg-slate-100 text-slate-600 rounded-full font-bold">
                   {result.difficultyLevel} Difficulty
                 </span>
               </h2>
-              <p className="text-slate-500">{result.sourceSummary}</p>
+              <p className="text-slate-500 dark:text-slate-400">{result.sourceSummary}</p>
             </div>
             <div className="mt-4 md:mt-0 flex flex-col items-end gap-3">
               <div className="flex items-center gap-3">
@@ -247,8 +247,8 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Focus Areas */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm col-span-1 lg:col-span-2">
-              <div className="flex items-center gap-2 mb-6 text-slate-800">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm col-span-1 lg:col-span-2">
+              <div className="flex items-center gap-2 mb-6 text-slate-800 dark:text-slate-200">
                 <Target className="text-blue-500" />
                 <h3 className="font-bold text-lg">Key Focus Areas</h3>
               </div>
@@ -265,8 +265,8 @@ export default function Home() {
             </div>
 
             {/* Evaluation Criteria */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm col-span-1 lg:col-span-1">
-              <div className="flex items-center gap-2 mb-6 text-slate-800">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm col-span-1 lg:col-span-1">
+              <div className="flex items-center gap-2 mb-6 text-slate-800 dark:text-slate-200">
                 <BarChart3 className="text-blue-500" />
                 <h3 className="font-bold text-lg">Evaluation Criteria</h3>
               </div>
@@ -275,14 +275,14 @@ export default function Home() {
                   (criteria: any, idx: number) => (
                     <div key={idx}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-slate-700">
+                        <span className="font-medium text-slate-700 dark:text-slate-300">
                           {criteria.name}
                         </span>
-                        <span className="text-slate-500">
+                        <span className="text-slate-500 dark:text-slate-400">
                           {criteria.percentage}%
                         </span>
                       </div>
-                      <div className="w-full bg-slate-100 rounded-full h-2">
+                      <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
                         <div
                           className="bg-blue-500 h-2 rounded-full"
                           style={{ width: `${criteria.percentage}%` }}
@@ -295,8 +295,8 @@ export default function Home() {
             </div>
 
             {/* Preparation Checklist */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm col-span-1 lg:col-span-2">
-              <div className="flex items-center gap-2 mb-6 text-slate-800">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm col-span-1 lg:col-span-2">
+              <div className="flex items-center gap-2 mb-6 text-slate-800 dark:text-slate-200">
                 <ListChecks className="text-blue-500" />
                 <h3 className="font-bold text-lg">Preparation Checklist</h3>
               </div>
@@ -306,16 +306,16 @@ export default function Home() {
                   .map((item: any, idx: number) => (
                     <div
                       key={idx}
-                      className="flex gap-4 items-start p-4 rounded-xl bg-slate-50 border border-slate-100"
+                      className="flex gap-4 items-start p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700"
                     >
                       <div className="mt-1">
                         <CheckCircle className="text-slate-300" size={20} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-800 mb-1">
+                        <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-1">
                           {item.title}
                         </h4>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
                           {item.description}
                         </p>
                       </div>
@@ -327,15 +327,15 @@ export default function Home() {
             {/* System Design & Coding Focus */}
             {(result.systemDesignFocus?.length > 0 ||
               result.codingFocus?.length > 0) && (
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm col-span-1 lg:col-span-1">
-                <div className="flex items-center gap-2 mb-6 text-slate-800">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm col-span-1 lg:col-span-1">
+              <div className="flex items-center gap-2 mb-6 text-slate-800 dark:text-slate-200">
                   <Cpu className="text-blue-500" />
                   <h3 className="font-bold text-lg">Technical Focus</h3>
                 </div>
 
                 {result.systemDesignFocus?.length > 0 && (
                   <div className="mb-6">
-                    <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+                    <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
                       System Design
                     </h4>
                     <ul className="space-y-2">
@@ -343,7 +343,7 @@ export default function Home() {
                         (item: string, idx: number) => (
                           <li
                             key={idx}
-                            className="text-sm text-slate-600 flex gap-2"
+                            className="text-sm text-slate-600 dark:text-slate-300 flex gap-2"
                           >
                             <span className="text-blue-400">•</span> {item}
                           </li>
@@ -382,7 +382,7 @@ export default function Home() {
       )}
 
       {/* --- FOOTER SECTION --- */}
-      <footer className="pt-20 pb-10 px-8 max-w-7xl mx-auto border-t border-slate-200 mt-20">
+      <footer className="pt-16 sm:pt-20 pb-10 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-200 dark:border-slate-800 mt-16 sm:mt-20">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
           <div className="md:col-span-4">
             <div className="flex items-center gap-2 mb-6">

@@ -120,22 +120,22 @@ export default function UploadResumePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <div className="bg-white border-b border-slate-200">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-900">
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
         <Navbar />
       </div>
-      <div className="max-w-6xl mx-auto px-6 py-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         {/* HEADER */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Resume Optimizer</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Resume Optimizer</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Tailor your profile to specific job descriptions and beat the ATS filters instantly.
           </p>
         </div>
         {/* Upload Grid */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Upload Resume */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-4">
               <span className="text-blue-500">
                 {/* File icon */}
@@ -144,11 +144,11 @@ export default function UploadResumePage() {
                   <polyline points="14 2 14 8 20 8"/>
                 </svg>
               </span>
-              <span className="font-semibold text-slate-900 text-sm">1. Upload Your Resume</span>
+              <span className="font-semibold text-slate-900 dark:text-white text-sm">1. Upload Your Resume</span>
             </div>
             {/* Drag & Drop Zone */}
             <label
-              className={`block border-2 border-dashed border-slate-200 rounded-xl p-10 text-center cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-colors group ${dragActive ? "border-blue-500 bg-blue-100" : ""}`}
+              className={`block border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-xl p-8 sm:p-10 text-center cursor-pointer hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group ${dragActive ? "border-blue-500 bg-blue-100 dark:bg-blue-900/30" : ""}`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -175,14 +175,14 @@ export default function UploadResumePage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-700">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                     Click to browse or drag and drop
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">PDF, DOCX up to 10MB</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">PDF, DOCX up to 10MB</p>
                 </div>
                 <button
                   type="button"
-                  className="mt-1 px-4 py-1.5 border border-slate-300 rounded-md text-xs font-medium text-slate-600 bg-white hover:bg-slate-50 transition"
+                  className="mt-1 px-4 py-1.5 border border-slate-300 dark:border-slate-600 rounded-md text-xs font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 transition"
                   onClick={handleSelectFileClick}
                 >
                   Select File
@@ -205,7 +205,7 @@ export default function UploadResumePage() {
           </div>
 
           {/* Job Description */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-4">
               <span className="text-blue-500">
                 {/* Clipboard icon */}
@@ -214,20 +214,20 @@ export default function UploadResumePage() {
                   <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
                 </svg>
               </span>
-              <span className="font-semibold text-slate-900 text-sm">2. Paste Job Description</span>
+              <span className="font-semibold text-slate-900 dark:text-white text-sm">2. Paste Job Description</span>
             </div>
 
             <textarea
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
               placeholder="Paste the full job requirements here to identify missing keywords and skills..."
-              className="w-full h-[calc(100%-3rem)] min-h-[200px] border border-slate-200 rounded-lg p-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+              className="w-full h-[calc(100%-3rem)] min-h-[200px] border border-slate-200 dark:border-slate-600 rounded-lg p-3 text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
             />
           </div>
         </div>
 
         {/* Template Selector */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
             <span className="text-blue-500">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -235,14 +235,14 @@ export default function UploadResumePage() {
                 <rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>
               </svg>
             </span>
-            <span className="font-semibold text-slate-900 text-sm">3. Choose a Template</span>
+            <span className="font-semibold text-slate-900 dark:text-white text-sm">3. Choose a Template</span>
           </div>
-          <div className="grid grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             {/* Classic */}
             <button
               type="button"
               onClick={() => setTemplate("classic")}
-              className={`rounded-xl border-2 p-4 text-left transition-all ${template === "classic" ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-blue-300"}`}
+              className={`rounded-xl border-2 p-3 sm:p-4 text-left transition-all ${template === "classic" ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30" : "border-slate-200 dark:border-slate-700 hover:border-blue-300"}`}
             >
               <div className="w-full h-28 bg-white border border-slate-200 rounded-lg mb-3 flex flex-col gap-1 p-2 overflow-hidden">
                 <div className="h-2 bg-slate-800 rounded w-1/2 mx-auto" />
@@ -255,8 +255,8 @@ export default function UploadResumePage() {
                 <div className="h-1 bg-slate-200 rounded w-full" />
                 <div className="h-1 bg-slate-200 rounded w-4/6" />
               </div>
-              <p className="font-semibold text-slate-800 text-sm">Classic</p>
-              <p className="text-xs text-slate-500 mt-0.5">Clean grey accents, ATS-friendly</p>
+              <p className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Classic</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Clean grey accents, ATS-friendly</p>
               {template === "classic" && <span className="text-xs text-blue-600 font-semibold mt-1 block">✓ Selected</span>}
             </button>
 
@@ -264,7 +264,7 @@ export default function UploadResumePage() {
             <button
               type="button"
               onClick={() => setTemplate("modern")}
-              className={`rounded-xl border-2 p-4 text-left transition-all ${template === "modern" ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-blue-300"}`}
+              className={`rounded-xl border-2 p-3 sm:p-4 text-left transition-all ${template === "modern" ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30" : "border-slate-200 dark:border-slate-700 hover:border-blue-300"}`}
             >
               <div className="w-full h-28 bg-white border border-slate-200 rounded-lg mb-3 flex flex-col gap-1 p-2 overflow-hidden">
                 <div className="h-2 bg-blue-600 rounded w-1/2 mx-auto" />
@@ -277,8 +277,8 @@ export default function UploadResumePage() {
                 <div className="h-1 bg-slate-200 rounded w-full" />
                 <div className="h-1 bg-slate-200 rounded w-4/6" />
               </div>
-              <p className="font-semibold text-slate-800 text-sm">Modern</p>
-              <p className="text-xs text-slate-500 mt-0.5">Blue accents, bold section titles</p>
+              <p className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Modern</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Blue accents, bold section titles</p>
               {template === "modern" && <span className="text-xs text-blue-600 font-semibold mt-1 block">✓ Selected</span>}
             </button>
 
@@ -286,7 +286,7 @@ export default function UploadResumePage() {
             <button
               type="button"
               onClick={() => setTemplate("compact")}
-              className={`rounded-xl border-2 p-4 text-left transition-all ${template === "compact" ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-blue-300"}`}
+              className={`rounded-xl border-2 p-3 sm:p-4 text-left transition-all ${template === "compact" ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30" : "border-slate-200 dark:border-slate-700 hover:border-blue-300"}`}
             >
               <div className="w-full h-28 bg-white border border-slate-200 rounded-lg mb-3 flex flex-col gap-1 p-2 overflow-hidden">
                 <div className="h-2.5 bg-slate-800 rounded w-1/3 mx-auto" />
@@ -301,8 +301,8 @@ export default function UploadResumePage() {
                 <div className="h-1 bg-slate-200 rounded w-full" />
                 <div className="h-1 bg-slate-200 rounded w-3/4" />
               </div>
-              <p className="font-semibold text-slate-800 text-sm">Compact</p>
-              <p className="text-xs text-slate-500 mt-0.5">Dense layout, more content per page</p>
+              <p className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Compact</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Dense layout, more content per page</p>
               {template === "compact" && <span className="text-xs text-blue-600 font-semibold mt-1 block">✓ Selected</span>}
             </button>
 
@@ -310,7 +310,7 @@ export default function UploadResumePage() {
             <button
               type="button"
               onClick={() => setTemplate("elegant")}
-              className={`rounded-xl border-2 p-4 text-left transition-all ${template === "elegant" ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-blue-300"}`}
+              className={`rounded-xl border-2 p-3 sm:p-4 text-left transition-all ${template === "elegant" ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30" : "border-slate-200 dark:border-slate-700 hover:border-blue-300"}`}
             >
               <div className="w-full h-28 bg-white border border-slate-200 rounded-lg mb-3 flex flex-col gap-1 p-2 overflow-hidden">
                 <div className="h-2 bg-teal-600 rounded w-1/2 mx-auto" />
@@ -323,8 +323,8 @@ export default function UploadResumePage() {
                 <div className="h-1 bg-slate-200 rounded w-full" />
                 <div className="h-1 bg-slate-200 rounded w-4/6" />
               </div>
-              <p className="font-semibold text-slate-800 text-sm">Elegant</p>
-              <p className="text-xs text-slate-500 mt-0.5">Teal accents, small-caps sections</p>
+              <p className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Elegant</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Teal accents, small-caps sections</p>
               {template === "elegant" && <span className="text-xs text-blue-600 font-semibold mt-1 block">✓ Selected</span>}
             </button>
 
@@ -332,7 +332,7 @@ export default function UploadResumePage() {
             <button
               type="button"
               onClick={() => setTemplate("sharp")}
-              className={`rounded-xl border-2 p-4 text-left transition-all ${template === "sharp" ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-blue-300"}`}
+              className={`rounded-xl border-2 p-3 sm:p-4 text-left transition-all ${template === "sharp" ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30" : "border-slate-200 dark:border-slate-700 hover:border-blue-300"}`}
             >
               <div className="w-full h-28 bg-white border border-slate-200 rounded-lg mb-3 flex flex-col gap-1 p-2 overflow-hidden">
                 <div className="h-2 bg-indigo-800 rounded w-1/2 mx-auto" />
@@ -345,8 +345,8 @@ export default function UploadResumePage() {
                 <div className="h-1 bg-slate-200 rounded w-full" />
                 <div className="h-1 bg-slate-200 rounded w-4/6" />
               </div>
-              <p className="font-semibold text-slate-800 text-sm">Sharp</p>
-              <p className="text-xs text-slate-500 mt-0.5">Bold navy, uppercase headers</p>
+              <p className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Sharp</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Bold navy, uppercase headers</p>
               {template === "sharp" && <span className="text-xs text-blue-600 font-semibold mt-1 block">✓ Selected</span>}
             </button>
           </div>
@@ -385,7 +385,7 @@ export default function UploadResumePage() {
           <div>
             {/* Preview Header */}
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2 font-semibold text-base text-slate-900">
+              <div className="flex items-center gap-2 font-semibold text-base text-slate-900 dark:text-white">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12"/>
                 </svg>
@@ -416,19 +416,19 @@ export default function UploadResumePage() {
 
               {/* Original */}
               <div>
-                <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-3">
+                <div className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold mb-3">
                   Original Version
                 </div>
 
                 {originalPdfUrl ? (
-                  <div className="relative bg-white border border-slate-200 rounded-xl shadow overflow-hidden">
+                  <div className="relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow overflow-hidden">
                     <iframe
                       src={`${originalPdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                       className="w-full h-[600px]"
                     />
                   </div>
                 ) : (
-                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl h-[600px] flex flex-col items-center justify-center text-slate-400 text-sm gap-2">
+                  <div className="bg-slate-50 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl h-[600px] flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 text-sm gap-2">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                     <span>Upload your resume above to preview it here</span>
                   </div>
@@ -441,7 +441,7 @@ export default function UploadResumePage() {
                   Optimized Version (ATS-Ready)
                 </div>
 
-                <div className="relative bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
+                <div className="relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden">
                   <iframe
                     src={`data:application/pdf;base64,${pdfBase64}#toolbar=0&navpanes=0&scrollbar=0`}
                     className="w-full h-[600px]"
@@ -452,7 +452,7 @@ export default function UploadResumePage() {
                 </div>
 
                 {/* Footer */}
-                <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
                     ATS Keywords Found (12)
@@ -469,10 +469,10 @@ export default function UploadResumePage() {
             {/* LaTeX Source */}
             {latex && (
               <details className="mt-8">
-                <summary className="cursor-pointer font-semibold text-sm text-slate-700">
+                <summary className="cursor-pointer font-semibold text-sm text-slate-700 dark:text-slate-300">
                   Show LaTeX Source
                 </summary>
-                <pre className="mt-4 bg-slate-200 p-4 rounded-md text-xs overflow-x-auto">
+                <pre className="mt-4 bg-slate-200 dark:bg-slate-700 p-4 rounded-md text-xs overflow-x-auto text-slate-800 dark:text-slate-200">
                   {latex}
                 </pre>
               </details>
@@ -483,7 +483,7 @@ export default function UploadResumePage() {
         {/* ── Saved Resumes History ── */}
         <div className="mt-14">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-slate-900">My Saved Resumes</h2>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">My Saved Resumes</h2>
             <span className="text-xs text-slate-400">{resumes.length} generated</span>
           </div>
 
@@ -497,14 +497,14 @@ export default function UploadResumePage() {
               value={historyFilter}
               onChange={(e) => setHistoryFilter(e.target.value)}
               placeholder="Filter by job description keyword..."
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
 
           {resumesLoading ? (
             <div className="text-sm text-slate-400 py-8 text-center">Loading saved resumes...</div>
           ) : resumes.length === 0 ? (
-            <div className="bg-white border border-dashed border-slate-200 rounded-xl py-12 text-center text-slate-400 text-sm">
+            <div className="bg-white dark:bg-slate-800 border border-dashed border-slate-200 dark:border-slate-700 rounded-xl py-12 text-center text-slate-400 dark:text-slate-500 text-sm">
               No saved resumes yet. Generate one above and it will appear here.
             </div>
           ) : (() => {
@@ -526,33 +526,33 @@ export default function UploadResumePage() {
             return (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filtered.map((r) => (
-                  <div key={r.id} className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+                  <div key={r.id} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
                     {/* Header */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
                         </svg>
-                        <span className="text-sm font-semibold text-slate-800 truncate">{r.originalFileName || "resume"}</span>
+                        <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{r.originalFileName || "resume"}</span>
                       </div>
                       <span className="shrink-0 text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 capitalize">{r.templateName ?? "classic"}</span>
                     </div>
 
                     {/* Job description snippet */}
-                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-3">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3">
                       {r.jobDescriptionSnippet || "No job description."}
                     </p>
 
                     {/* Footer */}
-                    <div className="flex items-center justify-between mt-auto pt-2 border-t border-slate-100">
-                      <span className="text-xs text-slate-400">
+                      <div className="flex items-center justify-between mt-auto pt-2 border-t border-slate-100 dark:border-slate-700">
+                        <span className="text-xs text-slate-400 dark:text-slate-500">
                         {new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                       </span>
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => downloadSavedResume(r.id, r.originalFileName)}
                           disabled={downloadingId === r.id}
-                          className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 disabled:opacity-50 transition-colors"
+                          className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-blue-600 disabled:opacity-50 transition-colors"
                         >
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>

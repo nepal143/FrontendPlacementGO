@@ -51,7 +51,7 @@ export default function RegisterPage() {
   const strengthTextColor = ["", "text-red-500", "text-amber-500", "text-green-500"];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100 font-sans">
+    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-slate-900 font-sans">
 
       {/* NAV */}
       <nav className="bg-[#1a1a2e] flex items-center justify-between px-6 h-14">
@@ -78,11 +78,11 @@ export default function RegisterPage() {
 
       {/* MAIN */}
       <div className="flex-1 flex items-center justify-center px-6 py-10">
-        <div className="bg-white border border-gray-200 rounded-2xl p-11 w-full max-w-md shadow-[0_8px_32px_rgba(0,0,0,0.07)]">
+        <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-8 sm:p-11 w-full max-w-md shadow-[0_8px_32px_rgba(0,0,0,0.07)]">
 
           {/* Logo */}
           <div className="flex justify-center mb-7">
-            <div className="flex items-center gap-2.5 text-slate-900 font-bold text-lg">
+            <div className="flex items-center gap-2.5 text-slate-900 dark:text-white font-bold text-lg">
               <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center text-lg">
                 📄
               </div>
@@ -90,16 +90,16 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-slate-900 text-center mb-1">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-1">
             Create your account
           </h1>
-          <p className="text-sm text-slate-500 text-center mb-8">
+          <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-8">
             Start optimizing your resume with AI — it's free
           </p>
 
           {/* Full Name */}
           <div className="mb-4">
-            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1.5">
               Full Name
             </label>
             <input
@@ -108,14 +108,14 @@ export default function RegisterPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && register()}
-              className={`w-full px-3.5 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white focus:border-blue-500 outline-none transition
-                ${fullName.trim().length > 1 ? "border-green-500" : "border-gray-200"}`}
+              className={`w-full px-3.5 py-2.5 border rounded-lg text-sm bg-gray-50 dark:bg-slate-700 dark:text-white focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition
+                ${fullName.trim().length > 1 ? "border-green-500" : "border-gray-200 dark:border-slate-600"}`}
             />
           </div>
 
           {/* Email */}
           <div className="mb-4">
-            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1.5">
               Email address
             </label>
             <input
@@ -124,14 +124,14 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && register()}
-              className={`w-full px-3.5 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white focus:border-blue-500 outline-none transition
-                ${email.includes("@") && email.includes(".") ? "border-green-500" : "border-gray-200"}`}
+              className={`w-full px-3.5 py-2.5 border rounded-lg text-sm bg-gray-50 dark:bg-slate-700 dark:text-white focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition
+                ${email.includes("@") && email.includes(".") ? "border-green-500" : "border-gray-200 dark:border-slate-600"}`}
             />
           </div>
 
           {/* Password */}
           <div className="mb-4">
-            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1.5">
               Password
             </label>
             <input
@@ -140,7 +140,7 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && register()}
-              className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:border-blue-500 outline-none transition"
+              className="w-full px-3.5 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-gray-50 dark:bg-slate-700 dark:text-white focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition"
             />
 
             {password.length > 0 && (
@@ -149,7 +149,7 @@ export default function RegisterPage() {
                   <div
                     key={i}
                     className={`flex-1 h-1 rounded transition-all
-                      ${strength >= i ? strengthColor[strength] : "bg-gray-200"}`}
+                      ${strength >= i ? strengthColor[strength] : "bg-gray-200 dark:bg-slate-600"}`}
                   />
                 ))}
                 <span className={`text-xs font-semibold ml-2 ${strengthTextColor[strength]}`}>
@@ -161,7 +161,7 @@ export default function RegisterPage() {
 
           {/* Confirm Password */}
           <div className="mb-4">
-            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+            <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1.5">
               Confirm Password
             </label>
             <input
@@ -170,19 +170,19 @@ export default function RegisterPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && register()}
-              className={`w-full px-3.5 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white focus:border-blue-500 outline-none transition
+              className={`w-full px-3.5 py-2.5 border rounded-lg text-sm bg-gray-50 dark:bg-slate-700 dark:text-white focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition
                 ${
                   confirmPassword.length > 0
                     ? confirmPassword === password
                       ? "border-green-500"
                       : "border-red-500"
-                    : "border-gray-200"
+                    : "border-gray-200 dark:border-slate-600"
                 }`}
             />
           </div>
 
           {/* Terms */}
-          <div className="flex items-start gap-2 mb-5 text-xs text-slate-500 leading-relaxed">
+          <div className="flex items-start gap-2 mb-5 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
             <input
               type="checkbox"
               className="mt-1 w-4 h-4 accent-blue-500 cursor-pointer"
@@ -217,23 +217,23 @@ export default function RegisterPage() {
 
           {/* Error */}
           {error && (
-            <div className="mt-3 text-sm text-red-500 text-center bg-red-50 border border-red-200 rounded-md py-2 px-3">
+            <div className="mt-3 text-sm text-red-500 text-center bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md py-2 px-3">
               ⚠ {error}
             </div>
           )}
 
           {/* Divider */}
-          <div className="flex items-center gap-3 my-5 text-xs text-slate-400">
-            <div className="flex-1 h-px bg-gray-200" />
+          <div className="flex items-center gap-3 my-5 text-xs text-slate-400 dark:text-slate-500">
+            <div className="flex-1 h-px bg-gray-200 dark:bg-slate-600" />
             <span>or sign up with</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px bg-gray-200 dark:bg-slate-600" />
           </div>
 
           {/* Google Sign In */}
           <GoogleSignInButton />
 
           {/* Login */}
-          <div className="text-center text-xs text-slate-500 mt-5">
+          <div className="text-center text-xs text-slate-500 dark:text-slate-400 mt-5">
             <a
               href="/login"
               className="text-blue-500 font-semibold hover:underline"
@@ -245,7 +245,7 @@ export default function RegisterPage() {
           {/* Badges */}
           <div className="flex justify-center gap-4 mt-6">
             {["AI-Powered", "ATS Optimized", "Free to Start"].map((badge) => (
-              <span key={badge} className="flex items-center gap-1 text-xs text-slate-500">
+              <span key={badge} className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                 {badge}
               </span>
