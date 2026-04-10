@@ -6,6 +6,19 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* PlacementGO design tokens — light */
+  --pg-bg:           #f4f6fb;
+  --pg-card:         white;
+  --pg-border:       #e8ecf4;
+  --pg-text:         #1a1d2e;
+  --pg-muted:        #7b8299;
+  --pg-input:        white;
+  --pg-chip:         #f4f6fb;
+  --pg-table-hdr:    #fafbfd;
+  --pg-label:        #4a4f6b;
+  --pg-nav-active:   #eef2ff;
+  --pg-neutral-text: #495057;
 }
 
 @theme inline {
@@ -23,6 +36,19 @@ body {
 .dark {
   --background: #0f172a;
   --foreground: #f1f5f9;
+
+  /* PlacementGO design tokens — dark */
+  --pg-bg:           #0f172a;
+  --pg-card:         #1e293b;
+  --pg-border:       #334155;
+  --pg-text:         #e2e8f0;
+  --pg-muted:        #94a3b8;
+  --pg-input:        #0f172a;
+  --pg-chip:         #334155;
+  --pg-table-hdr:    #1e293b;
+  --pg-label:        #94a3b8;
+  --pg-nav-active:   rgba(30, 58, 138, 0.2);
+  --pg-neutral-text: #94a3b8;
 }
 
 /* Smooth theme transitions */

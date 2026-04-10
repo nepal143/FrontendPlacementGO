@@ -45,8 +45,8 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="bg-white border border-gray-200 rounded-2xl p-10 w-full max-w-md shadow-[0_8px_32px_rgba(0,0,0,0.07)]">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--pg-bg)] px-4">
+      <div className="bg-[var(--pg-card)] border border-[var(--pg-border)] rounded-2xl p-10 w-full max-w-md shadow-[0_8px_32px_rgba(0,0,0,0.07)]">
         {/* Logo */}
         <div className="flex justify-center mb-7">
           <div className="flex items-center gap-2 font-bold text-lg text-slate-900">
@@ -76,7 +76,7 @@ function ResetPasswordForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={!token}
-                className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:border-blue-500 outline-none transition disabled:opacity-50"
+                className="w-full px-3.5 py-2.5 border border-[var(--pg-border)] rounded-lg text-sm bg-gray-50 focus:bg-[var(--pg-card)] focus:border-blue-500 outline-none transition disabled:opacity-50"
               />
             </div>
 
@@ -89,7 +89,7 @@ function ResetPasswordForm() {
                 onChange={(e) => setConfirm(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleReset()}
                 disabled={!token}
-                className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:border-blue-500 outline-none transition disabled:opacity-50"
+                className="w-full px-3.5 py-2.5 border border-[var(--pg-border)] rounded-lg text-sm bg-gray-50 focus:bg-[var(--pg-card)] focus:border-blue-500 outline-none transition disabled:opacity-50"
               />
             </div>
 

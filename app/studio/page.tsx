@@ -29,9 +29,9 @@ export default function ResumeStudio() {
   if (authLoading || !isLoggedIn) return null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans">
+    <div className="min-h-screen bg-[var(--pg-bg)] text-[var(--pg-text)] font-sans">
       {/* --- TOP NAVIGATION --- */}
-      <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <nav className="bg-[var(--pg-card)] border-b border-[var(--pg-border)] sticky top-0 z-50">
         <Navbar />
       </nav>
 
@@ -39,7 +39,7 @@ export default function ResumeStudio() {
         {/* --- HEADER --- */}
         <div className="mb-10">
           <h1 className="text-3xl font-black mb-2">Resume Optimizer</h1>
-          <p className="text-slate-500 font-medium">
+          <p className="text-[var(--pg-muted)] font-medium">
             Tailor your profile to specific job descriptions and beat the ATS
             filters instantly.
           </p>
@@ -48,7 +48,7 @@ export default function ResumeStudio() {
         {/* --- INPUT SECTION --- */}
         <div className="grid lg:grid-cols-2 gap-8 mb-12">
           {/* 1. Upload Resume */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm group hover:border-blue-300 transition-all">
+          <div className="bg-[var(--pg-card)] rounded-2xl border border-[var(--pg-border)] p-8 shadow-sm group hover:border-blue-300 transition-all">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center font-bold">
                 1
@@ -65,26 +65,26 @@ export default function ResumeStudio() {
               className={`border-2 border-dashed rounded-2xl p-12 flex flex-col items-center justify-center transition-all ${
                 isDragging
                   ? "border-blue-500 bg-blue-50/50"
-                  : "border-slate-200 bg-slate-50/30"
+                  : "border-[var(--pg-border)] bg-slate-50/30"
               }`}
             >
-              <div className="w-14 h-14 bg-white shadow-md rounded-2xl flex items-center justify-center text-blue-600 mb-4">
+              <div className="w-14 h-14 bg-[var(--pg-card)] shadow-md rounded-2xl flex items-center justify-center text-blue-600 mb-4">
                 <Upload size={24} />
               </div>
               <p className="font-bold text-sm mb-1">
                 Click to browse or drag and drop
               </p>
-              <p className="text-xs text-slate-400 mb-6">
+              <p className="text-xs text-[var(--pg-muted)] mb-6">
                 PDF, DOCX up to 10MB
               </p>
-              <button className="bg-white border border-slate-200 px-6 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors">
+              <button className="bg-[var(--pg-card)] border border-[var(--pg-border)] px-6 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-[var(--pg-chip)] transition-colors">
                 Select File
               </button>
             </div>
           </div>
 
           {/* 2. Paste Job Description */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm flex flex-col">
+          <div className="bg-[var(--pg-card)] rounded-2xl border border-[var(--pg-border)] p-8 shadow-sm flex flex-col">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center font-bold">
                 2
@@ -93,7 +93,7 @@ export default function ResumeStudio() {
             </div>
             <textarea
               placeholder="Paste the full job requirements here to identify missing keywords and skills..."
-              className="flex-1 w-full p-6 bg-slate-50/30 border border-slate-100 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none min-h-[200px]"
+              className="flex-1 w-full p-6 bg-slate-50/30 border border-[var(--pg-border)] rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none min-h-[200px]"
             />
           </div>
         </div>
@@ -104,7 +104,7 @@ export default function ResumeStudio() {
             <Sparkles size={20} />
             Generate Optimized Resume
           </button>
-          <div className="flex gap-6 text-xs font-bold text-slate-400">
+          <div className="flex gap-6 text-xs font-bold text-[var(--pg-muted)]">
             <span className="flex items-center gap-2">
               <CheckCircle2 size={14} className="text-green-500" /> AI-Powered
               Analysis
@@ -117,9 +117,9 @@ export default function ResumeStudio() {
         </div>
 
         {/* --- PREVIEW SECTION --- */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-[var(--pg-card)] rounded-3xl border border-[var(--pg-border)] shadow-sm overflow-hidden">
           {/* Preview Toolbar */}
-          <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="p-6 border-b border-[var(--pg-border)] bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
                 <Sparkles size={20} />
@@ -146,7 +146,7 @@ export default function ResumeStudio() {
           <div className="grid lg:grid-cols-2 divide-x divide-slate-100 min-h-[800px]">
             {/* Original Version */}
             <div className="p-12 relative">
-              <div className="absolute top-6 left-12 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              <div className="absolute top-6 left-12 text-[10px] font-black text-[var(--pg-muted)] uppercase tracking-[0.2em]">
                 Original Version
               </div>
               <div className="mt-8 opacity-40 select-none grayscale">
@@ -161,7 +161,7 @@ export default function ResumeStudio() {
                 Optimized Version (ATS-READY)
               </div>
 
-              <div className="bg-white shadow-[0_10px_40px_rgba(0,0,0,0.04)] rounded-xl border border-slate-100 p-12 min-h-full">
+              <div className="bg-[var(--pg-card)] shadow-[0_10px_40px_rgba(0,0,0,0.04)] rounded-xl border border-[var(--pg-border)] p-12 min-h-full">
                 <ResumeContent name="ALEX JOHNSON" />
 
                 {/* Optimized Badge */}
@@ -207,7 +207,7 @@ function NavTab({
   return (
     <button
       className={`text-sm font-bold transition-all relative py-2 ${
-        active ? "text-blue-600" : "text-slate-500 hover:text-slate-900"
+        active ? "text-blue-600" : "text-[var(--pg-muted)] hover:text-[var(--pg-text)]"
       }`}
     >
       {label}
@@ -237,10 +237,10 @@ function ResumeContent({
   return (
     <div className="font-serif text-[13px] leading-relaxed text-[#1e293b]">
       <div className="text-center mb-10">
-        <h2 className="text-2xl font-bold tracking-[0.1em] text-slate-900 mb-2">
+        <h2 className="text-2xl font-bold tracking-[0.1em] text-[var(--pg-text)] mb-2">
           {name}
         </h2>
-        <p className="text-slate-500 text-xs">
+        <p className="text-[var(--pg-muted)] text-xs">
           New York, NY | alex.j@email.com |{" "}
           <span className="text-blue-600">linkedin.com/in/alexj</span>
         </p>
@@ -256,11 +256,11 @@ function ResumeContent({
       </Section>
 
       <Section title="PROFESSIONAL EXPERIENCE">
-        <div className="flex justify-between font-bold text-slate-900 mb-1">
+        <div className="flex justify-between font-bold text-[var(--pg-text)] mb-1">
           <span>Software Engineer II</span>
           <span>Oct 2021 - Present</span>
         </div>
-        <div className="italic text-slate-500 text-xs mb-3">
+        <div className="italic text-[var(--pg-muted)] text-xs mb-3">
           TechCorp Solutions | New York, NY
         </div>
         <ul className="list-disc pl-4 space-y-2">
@@ -311,10 +311,10 @@ function Section({
 }) {
   return (
     <div className="mb-8">
-      <h4 className="text-[11px] font-black text-slate-900 border-b-2 border-slate-900 mb-4 pb-1 tracking-widest">
+      <h4 className="text-[11px] font-black text-[var(--pg-text)] border-b-2 border-slate-900 mb-4 pb-1 tracking-widest">
         {title}
       </h4>
-      <div className="text-slate-700">{children}</div>
+      <div className="text-[var(--pg-text)]">{children}</div>
     </div>
   );
 }
