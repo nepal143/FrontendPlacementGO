@@ -43,6 +43,7 @@ export default function Navbar() {
     { href: "/resumeoptimizer", label: "Resume Optimizer" },
     { href: "/referalfinder", label: "Referral Finder" },
     { href: "/interview", label: "Interview Guide" },
+    { href: "/premium", label: "Job Automation"},
     ...(isLoggedIn ? [{ href: "/dashboard", label: "Dashboard" }] : []),
   ];
 
