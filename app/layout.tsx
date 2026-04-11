@@ -200,6 +200,10 @@ export default function RootLayout({
           src="https://accounts.google.com/gsi/client"
           strategy="beforeInteractive"
         />
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="lazyOnload"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

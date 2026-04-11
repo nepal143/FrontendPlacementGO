@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../component/Navbar";
+import UpgradeModal, { useSubscription } from "../component/UpgradeModal";
 import { apiFetch, API_BASE_URL } from "@/lib/api";
 
 // --- Types ---
@@ -59,6 +60,10 @@ function timeAgo(dateStr: string): string {
 export default function PlacementGoPage() {
   const { isLoggedIn, loading } = useAuth();
   const router = useRouter();
+
+  // Subscription state
+  const { status: subStatus, refresh: refreshSub } = useSubscription();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   // Filter state
   const [roleCategory, setRoleCategory] = useState("Software Engineer");
@@ -183,12 +188,31 @@ export default function PlacementGoPage() {
             <p className="text-gray-500 text-sm">Access curated roles with high-match potential and AI-powered outreach automation.</p>
             <p className="text-gray-400 text-xs mt-0.5">Your personalized application engine is ready.</p>
           </div>
-          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 self-start shrink-0">
-            <div className="text-right">
-              <div className="text-xs text-gray-400 font-medium">JOBS FOUND</div>
-              <div className="flex items-center gap-1 mt-0.5">
-                <span className="font-bold text-gray-800 mono">{jobsLoading ? "..." : jobs.length}</span>
-                <span className="text-gray-400 text-sm">results</span>
+          <div className="flex items-center gap-3 self-start shrink-0">
+            {subStatus.isPremium ? (
+              <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                <span className="text-green-600 font-bold text-sm">✓ PRO Active</span>
+                {subStatus.expiresAt && (
+                  <span className="text-green-500 text-xs">
+                    · expires {new Date(subStatus.expiresAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => setUpgradeOpen(true)}
+                className="auto-apply-btn text-white font-bold px-5 py-3 rounded-xl hover:opacity-90 transition-opacity text-sm whitespace-nowrap"
+              >
+                ✨ Upgrade to PRO — ₹499/mo
+              </button>
+            )}
+            <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3">
+              <div className="text-right">
+                <div className="text-xs text-gray-400 font-medium">JOBS FOUND</div>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="font-bold text-gray-800 mono">{jobsLoading ? "..." : jobs.length}</span>
+                  <span className="text-gray-400 text-sm">results</span>
+                </div>
               </div>
             </div>
           </div>
@@ -406,11 +430,22 @@ export default function PlacementGoPage() {
             <div className="plan-card rounded-2xl p-5">
               <div className="text-[10px] font-semibold text-blue-300 uppercase tracking-widest mb-1">Current Plan</div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-white font-bold text-lg">Premium Pro</span>
+                <span className="text-white font-bold text-lg">
+                  {subStatus.isPremium ? "Premium Pro ✓" : "Free"}
+                </span>
               </div>
-              <button className="w-full bg-[#1A56FF] text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-[#0038CC] transition-colors">
-                Manage Subscription
-              </button>
+              {subStatus.isPremium ? (
+                <div className="w-full bg-green-500/10 border border-green-500/30 text-green-400 text-sm font-semibold py-2.5 rounded-xl text-center">
+                  PRO Active
+                </div>
+              ) : (
+                <button
+                  onClick={() => setUpgradeOpen(true)}
+                  className="w-full bg-[#1A56FF] text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-[#0038CC] transition-colors"
+                >
+                  ✨ Upgrade to PRO
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -443,6 +478,13 @@ export default function PlacementGoPage() {
           </div>
         </div>
       </footer>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={upgradeOpen}
+        onClose={() => setUpgradeOpen(false)}
+        onSuccess={refreshSub}
+      />
     </div>
   );
 }
