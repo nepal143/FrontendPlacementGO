@@ -125,13 +125,13 @@ export default function PlacementGoPage() {
         window.open(res.redirectUrl, "_blank", "noopener,noreferrer");
       }
       setAppliedJobs((prev) => [
-        { id: job.platformJobId, title: job.title, company: `${job.companyName} • Auto-Applied`, status: res.success ? "Success" : "Pending", time: "Just now", color },
+        { id: job.platformJobId, title: job.title, company: `${job.companyName} • Auto-Applied`, status: (res.success ? "Success" : "Pending") as AppliedJob["status"], time: "Just now", color },
         ...prev,
       ].slice(0, 5));
       setAppliedIds((prev) => new Set([...prev, job.platformJobId]));
     } catch {
       setAppliedJobs((prev) => [
-        { id: job.platformJobId, title: job.title, company: job.companyName, status: "Failed", time: "Just now", color },
+        { id: job.platformJobId, title: job.title, company: job.companyName, status: "Failed" as AppliedJob["status"], time: "Just now", color },
         ...prev,
       ].slice(0, 5));
     } finally {
