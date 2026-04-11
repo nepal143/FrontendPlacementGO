@@ -25,6 +25,8 @@ export default function UploadResumePage() {
   const [historyFilter, setHistoryFilter] = useState("");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [deletingResumeId, setDeletingResumeId] = useState<string | null>(null);
+  const [atsScore, setAtsScore] = useState<number | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const { resumes, loading: resumesLoading, refresh: refreshResumes } = useResumes();
 
@@ -48,6 +50,8 @@ export default function UploadResumePage() {
       setError("");
       setPdfBase64(null);
       setLatex(null);
+      setAtsScore(null);
+      setSuggestions([]);
 
       const data = await apiFetch(`${API_BASE_URL}/api/resumes/upload`, {
         method: "POST",
@@ -61,6 +65,8 @@ export default function UploadResumePage() {
 
       setPdfBase64(data.pdfBase64);
       setLatex(data.latex);
+      setAtsScore(typeof data.atsScore === "number" ? data.atsScore : null);
+      setSuggestions(Array.isArray(data.suggestions) ? data.suggestions : []);
       refreshResumes();
     } catch (err: any) {
       setError(err.message || "Something went wrong");
@@ -393,9 +399,20 @@ export default function UploadResumePage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="bg-green-50 border border-green-200 text-green-600 font-bold text-sm px-4 py-1.5 rounded-full flex items-center gap-1.5">
-                  ATS SCORE <span className="text-green-700 text-base font-extrabold">94%</span>
-                </div>
+              <div className={`border font-bold text-sm px-4 py-1.5 rounded-full flex items-center gap-1.5 ${
+                  atsScore === null
+                    ? "bg-slate-100 border-slate-200 text-slate-500"
+                    : atsScore >= 75
+                    ? "bg-green-50 border-green-200 text-green-600"
+                    : atsScore >= 50
+                    ? "bg-yellow-50 border-yellow-200 text-yellow-600"
+                    : "bg-red-50 border-red-200 text-red-600"
+                }`}>
+                ATS SCORE{" "}
+                <span className="text-base font-extrabold">
+                  {atsScore === null ? "—" : `${atsScore}%`}
+                </span>
+              </div>
 
                 <button
                   onClick={downloadPdf}
@@ -476,6 +493,31 @@ export default function UploadResumePage() {
                   {latex}
                 </pre>
               </details>
+            )}
+
+            {/* AI Suggestions */}
+            {suggestions.length > 0 && (
+              <div className="mt-8 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">AI Improvement Suggestions</h3>
+                  <span className="ml-auto text-xs text-slate-400">{suggestions.length} suggestions</span>
+                </div>
+                <ul className="space-y-3">
+                  {suggestions.map((s, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-amber-100 text-amber-600 text-xs font-bold flex items-center justify-center">
+                        {i + 1}
+                      </span>
+                      <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{s}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
           </div>
         )}
