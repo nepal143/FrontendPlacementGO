@@ -359,6 +359,17 @@ export default function Dashboard() {
     fetchApplications();
   }, [authLoading]);
 
+  // Auto-refresh when user returns to this tab (e.g. after applying via premium jobs page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchApplications();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
+
   // ─── API Functions ────────────────────────────────────────────────────────
 
   const getAuthHeaders = () => {

@@ -154,8 +154,13 @@ export default function PlacementGoPage() {
         select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px !important; }
         @media (max-width: 768px) {
           .mobile-nav { display: flex !important; }
-          .sidebar-col { display: none !important; }
+          .sidebar-col { display: flex !important; }
           .main-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 640px) {
+          .filter-row { flex-wrap: nowrap !important; overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 8px; padding-bottom: 4px; }
+          .filter-row > div { min-width: 130px; flex-shrink: 0; }
+          .filter-row > button { flex-shrink: 0; }
         }
         @media (min-width: 769px) {
           .mobile-nav { display: none !important; }
@@ -190,7 +195,7 @@ export default function PlacementGoPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-5 flex flex-wrap gap-3 items-end">
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-5 flex flex-wrap filter-row gap-3 items-end">
           <div className="flex flex-col gap-1 flex-1 min-w-[140px]">
             <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Role Category</label>
             <select
