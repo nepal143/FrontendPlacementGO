@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { getUnreadCount } from "../../services/autoapply.service";
+import UpgradeModal, { useSubscription } from "./UpgradeModal";
 
 function MoonIcon() {
   return (
@@ -38,6 +39,8 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notifCount, setNotifCount] = useState(0);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const { status: subStatus, refresh: refreshSub } = useSubscription();
 
   useEffect(() => setMounted(true), []);
 
@@ -62,6 +65,7 @@ export default function Navbar() {
   const isDark = resolvedTheme === "dark";
 
   return (
+    <>
     <nav className="relative bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
       <div className="flex items-center justify-between px-4 sm:px-8 py-4 max-w-7xl mx-auto">
         {/* Logo */}
@@ -121,6 +125,19 @@ export default function Navbar() {
                 <Link href="/dashboard" className="text-sm font-semibold hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition">
                   Dashboard
                 </Link>
+                {/* PRO / Upgrade button */}
+                {subStatus.isPremium ? (
+                  <span className="flex items-center gap-1.5 bg-yellow-400/10 border border-yellow-400/40 text-yellow-600 dark:text-yellow-400 text-xs font-bold px-3 py-1.5 rounded-full">
+                    ⚡ PRO
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => setShowUpgradeModal(true)}
+                    className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:opacity-90 transition flex items-center gap-1"
+                  >
+                    ⚡ Upgrade to PRO
+                  </button>
+                )}
                 <button
                   onClick={logout}
                   className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition"
@@ -181,12 +198,29 @@ export default function Navbar() {
           ))}
           <div className="border-t border-slate-100 dark:border-slate-800 mt-2 pt-2">
             {isLoggedIn ? (
-              <button
-                onClick={() => { logout(); setMenuOpen(false); }}
-                className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-              >
-                Logout
-              </button>
+              <>
+                {/* PRO / Upgrade in mobile menu */}
+                {subStatus.isPremium ? (
+                  <div className="px-3 py-2 flex items-center gap-2">
+                    <span className="bg-yellow-400/10 border border-yellow-400/40 text-yellow-600 dark:text-yellow-400 text-xs font-bold px-3 py-1.5 rounded-full">
+                      ⚡ PRO Member
+                    </span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { setShowUpgradeModal(true); setMenuOpen(false); }}
+                    className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-yellow-400 to-orange-500 hover:opacity-90 transition mb-1"
+                  >
+                    ⚡ Upgrade to PRO — ₹499/mo
+                  </button>
+                )}
+                <button
+                  onClick={() => { logout(); setMenuOpen(false); }}
+                  className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                >
+                  Logout
+                </button>
+              </>
             ) : (
               <div className="flex flex-col gap-2">
                 <Link
@@ -209,5 +243,11 @@ export default function Navbar() {
         </div>
       )}
     </nav>
+    <UpgradeModal
+      isOpen={showUpgradeModal}
+      onClose={() => setShowUpgradeModal(false)}
+      onSuccess={() => { refreshSub(); setShowUpgradeModal(false); }}
+    />
+    </>
   );
 }

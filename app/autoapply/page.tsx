@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { useAutoApply } from "../../hooks/useAutoApply";
 import type { JobLeadDto, AutoApplyConfig, ApplicationTemplate } from "../../types/autoapply.types";
+import UpgradeModal, { useSubscription } from "../component/UpgradeModal";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -433,6 +434,8 @@ export default function AutoApplyPage() {
   const [activeTab, setActiveTab] = useState<"leads" | "config" | "notifications">("leads");
   const [selectedLead, setSelectedLead] = useState<JobLeadDto | null>(null);
   const [showNotifs, setShowNotifs] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const { status: subStatus, refresh: refreshSub } = useSubscription();
 
   if (!isLoggedIn) {
     router.replace("/login");
@@ -493,6 +496,27 @@ export default function AutoApplyPage() {
         {error && (
           <div className="mb-4 px-4 py-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm rounded-xl border border-red-200 dark:border-red-800">
             {error}
+          </div>
+        )}
+
+        {/* Upgrade to PRO banner (non-premium users) */}
+        {!subStatus.isPremium && (
+          <div className="mb-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-700 rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl mt-0.5">⚡</span>
+              <div>
+                <p className="text-sm font-bold text-slate-800 dark:text-white">Unlock unlimited Job Automation with PRO</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Get unlimited scans, AI match scoring, auto-apply &amp; real-time alerts — only ₹499/month
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowUpgradeModal(true)}
+              className="shrink-0 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:opacity-90 transition whitespace-nowrap"
+            >
+              Upgrade to PRO →
+            </button>
           </div>
         )}
 
@@ -654,6 +678,13 @@ export default function AutoApplyPage() {
       {selectedLead && (
         <TemplateModal lead={selectedLead} onClose={() => setSelectedLead(null)} />
       )}
+
+      {/* Upgrade modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onSuccess={() => { refreshSub(); setShowUpgradeModal(false); }}
+      />
     </div>
   );
 }
