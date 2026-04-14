@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
+import { getUnreadCount } from "../../services/autoapply.service";
 
 function MoonIcon() {
   return (
@@ -36,14 +37,25 @@ export default function Navbar() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notifCount, setNotifCount] = useState(0);
 
   useEffect(() => setMounted(true), []);
+
+  // Poll unread notification count every 60 s when logged in
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    getUnreadCount().then(setNotifCount).catch(() => {});
+    const interval = setInterval(() => {
+      getUnreadCount().then(setNotifCount).catch(() => {});
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, [isLoggedIn]);
 
   const navLinks = [
     { href: "/resumeoptimizer", label: "Resume Optimizer" },
     { href: "/referalfinder", label: "Referral Finder" },
     { href: "/interview", label: "Interview Guide" },
-    { href: "/premium", label: "Job Automation"},
+    { href: "/autoapply", label: "Job Automation" },
     ...(isLoggedIn ? [{ href: "/dashboard", label: "Dashboard" }] : []),
   ];
 
@@ -94,6 +106,18 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {isLoggedIn ? (
               <>
+                {/* Notification bell */}
+                <Link href="/autoapply" className="relative p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  aria-label="Job Automation notifications">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                  </svg>
+                  {notifCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold leading-none">
+                      {notifCount > 9 ? "9+" : notifCount}
+                    </span>
+                  )}
+                </Link>
                 <Link href="/dashboard" className="text-sm font-semibold hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition">
                   Dashboard
                 </Link>
