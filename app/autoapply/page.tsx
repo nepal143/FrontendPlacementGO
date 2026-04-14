@@ -442,7 +442,7 @@ export default function AutoApplyPage() {
   const router = useRouter();
   const {
     config, stats, leadsPage, notifications, unreadCount,
-    scanning, savingConfig, error,
+    scanning, scanPending, savingConfig, error,
     updateConfig, scan, applyToLead, skipALead, regenTemplate, loadMoreLeads, markAllRead,
     page, reload,
   } = useAutoApply();
@@ -515,6 +515,16 @@ export default function AutoApplyPage() {
             <button onClick={reload} className="shrink-0 text-xs font-semibold underline hover:no-underline">
               Retry
             </button>
+          </div>
+        )}
+
+        {/* Scan-in-progress banner */}
+        {scanPending && (
+          <div className="mb-4 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-sm rounded-xl border border-blue-200 dark:border-blue-800 flex items-center gap-3">
+            <svg className="animate-spin w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+            </svg>
+            <span>Scanning for job matches… New leads will appear automatically as they&apos;re found.</span>
           </div>
         )}
 

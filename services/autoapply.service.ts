@@ -27,7 +27,7 @@ export async function saveAutoApplyConfig(config: Partial<AutoApplyConfig>): Pro
 
 // ── Scan ──────────────────────────────────────────────────────────────────────
 
-export async function triggerScan(): Promise<{ discovered: number; autoApplied: number; manualRequired: number }> {
+export async function triggerScan(): Promise<{ started: boolean; message: string }> {
   return apiFetch(`${API_BASE_URL}/api/v1/autoapply/scan`, { method: "POST" });
 }
 

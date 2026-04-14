@@ -30,6 +30,7 @@ export function useAutoApply() {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [scanning, setScanning] = useState(false);
+  const [scanPending, setScanPending] = useState(false);
   const [savingConfig, setSavingConfig] = useState(false);
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,6 +83,10 @@ export function useAutoApply() {
           getAutoApplyStats().then(setStats).catch(() => {});
           getJobLeads(0).then(setLeadsPage).catch(() => {});
         }
+        // JOB_FOUND = scan complete
+        if (data.type === "JOB_FOUND") {
+          setScanPending(false);
+        }
       } catch {
         // ignore malformed events
       }
@@ -108,11 +113,9 @@ export function useAutoApply() {
     setError(null);
     try {
       await triggerScan();
-      // Reload leads + stats after scan
-      const [st, leads] = await Promise.all([getAutoApplyStats(), getJobLeads(0)]);
-      setStats(st);
-      setLeadsPage(leads);
-      setPage(0);
+      // Scan is async on the backend — leads will arrive via SSE notifications.
+      // Just mark scan as pending; JOB_FOUND event will clear it.
+      setScanPending(true);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Scan failed");
     } finally {
@@ -169,6 +172,7 @@ export function useAutoApply() {
     notifications,
     unreadCount,
     scanning,
+    scanPending,
     savingConfig,
     loadingLeads,
     error,
