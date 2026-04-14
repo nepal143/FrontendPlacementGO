@@ -15,6 +15,7 @@ import {
   getJobLeads,
   markLeadApplied,
   skipLead,
+  regenerateTemplate,
   getAutoApplyStats,
   getNotifications,
   getUnreadCount,
@@ -133,6 +134,17 @@ export function useAutoApply() {
     setLeadsPage(leads);
   }, [page]);
 
+  const regenTemplate = useCallback(async (leadId: string) => {
+    const updated = await regenerateTemplate(leadId);
+    setLeadsPage((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        content: prev.content.map((l) => (l.id === leadId ? updated : l)),
+      };
+    });
+  }, []);
+
   const loadMoreLeads = useCallback(async (nextPage: number) => {
     setLoadingLeads(true);
     try {
@@ -165,6 +177,7 @@ export function useAutoApply() {
     scan,
     applyToLead,
     skipALead,
+    regenTemplate,
     loadMoreLeads,
     markAllRead,
     reload: loadAll,

@@ -53,6 +53,12 @@ export async function skipLead(leadId: string): Promise<void> {
   });
 }
 
+export async function regenerateTemplate(leadId: string): Promise<JobLeadDto> {
+  return apiFetch(`${API_BASE_URL}/api/v1/autoapply/leads/${encodeURIComponent(leadId)}/regenerate-template`, {
+    method: "POST",
+  });
+}
+
 export async function getAutoApplyStats(): Promise<AutoApplyStats> {
   return apiFetch(`${API_BASE_URL}/api/v1/autoapply/stats`);
 }

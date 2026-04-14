@@ -185,10 +185,19 @@ function TemplateModal({ lead, onClose }: { lead: JobLeadDto; onClose: () => voi
   );
 }
 
-function LeadCard({ lead, onApply, onSkip, onOpen }:
-  { lead: JobLeadDto; onApply: () => void; onSkip: () => void; onOpen: () => void }) {
+function LeadCard({ lead, onApply, onSkip, onOpen, onRegenTemplate }:
+  { lead: JobLeadDto; onApply: () => void; onSkip: () => void; onOpen: () => void; onRegenTemplate: () => void }) {
   const reasons = parseReasons(lead.matchReasons);
   const isActionable = lead.status === "PENDING_REVIEW" || lead.status === "MANUAL_REQUIRED";
+
+  // Detect if template fields are empty (no resume data was used)
+  let templateHasResume = false;
+  try {
+    if (lead.applicationTemplate) {
+      const t = JSON.parse(lead.applicationTemplate);
+      templateHasResume = !!(t?.fields?.fullName || t?.fields?.email);
+    }
+  } catch { /* ignore */ }
 
   return (
     <div className={`bg-white dark:bg-slate-800 rounded-xl border p-5 transition hover:shadow-md ${scoreBg(lead.aiMatchScore)}`}>
@@ -248,6 +257,12 @@ function LeadCard({ lead, onApply, onSkip, onOpen }:
               Skip
             </button>
           </>
+        )}
+        {!templateHasResume && (
+          <button onClick={onRegenTemplate} title="Update template with your latest resume"
+            className="text-xs border border-amber-400 text-amber-600 dark:text-amber-400 px-2 py-2 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition">
+            ↺ Update Template
+          </button>
         )}
       </div>
     </div>
@@ -427,7 +442,7 @@ export default function AutoApplyPage() {
   const {
     config, stats, leadsPage, notifications, unreadCount,
     scanning, savingConfig, error,
-    updateConfig, scan, applyToLead, skipALead, loadMoreLeads, markAllRead,
+    updateConfig, scan, applyToLead, skipALead, regenTemplate, loadMoreLeads, markAllRead,
     page,
   } = useAutoApply();
 
@@ -562,7 +577,8 @@ export default function AutoApplyPage() {
                   <LeadCard key={lead.id} lead={lead}
                     onApply={() => applyToLead(lead.id)}
                     onSkip={() => skipALead(lead.id)}
-                    onOpen={() => setSelectedLead(lead)} />
+                    onOpen={() => setSelectedLead(lead)}
+                    onRegenTemplate={() => regenTemplate(lead.id)} />
                 ))}
               </div>
             )}
