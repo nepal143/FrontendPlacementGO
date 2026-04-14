@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { useAutoApply } from "../../hooks/useAutoApply";
 import type { JobLeadDto, AutoApplyConfig, ApplicationTemplate } from "../../types/autoapply.types";
+import { getJobLead } from "../../services/autoapply.service";
 import UpgradeModal, { useSubscription } from "../component/UpgradeModal";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -443,7 +444,7 @@ export default function AutoApplyPage() {
     config, stats, leadsPage, notifications, unreadCount,
     scanning, savingConfig, error,
     updateConfig, scan, applyToLead, skipALead, regenTemplate, loadMoreLeads, markAllRead,
-    page,
+    page, reload,
   } = useAutoApply();
 
   const [activeTab, setActiveTab] = useState<"leads" | "config" | "notifications">("leads");
@@ -509,8 +510,11 @@ export default function AutoApplyPage() {
 
         {/* Error banner */}
         {error && (
-          <div className="mb-4 px-4 py-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm rounded-xl border border-red-200 dark:border-red-800">
-            {error}
+          <div className="mb-4 px-4 py-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm rounded-xl border border-red-200 dark:border-red-800 flex items-center justify-between gap-3">
+            <span>{error}</span>
+            <button onClick={reload} className="shrink-0 text-xs font-semibold underline hover:no-underline">
+              Retry
+            </button>
           </div>
         )}
 
@@ -672,8 +676,11 @@ export default function AutoApplyPage() {
                         </div>
                         <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">{n.message}</p>
                         {meta.jobLeadId && (
-                          <button onClick={() => {
-                            const lead = leads.find(l => l.id === meta.jobLeadId);
+                          <button onClick={async () => {
+                            let lead = leads.find(l => l.id === meta.jobLeadId);
+                            if (!lead) {
+                              try { lead = await getJobLead(meta.jobLeadId as string); } catch { /* ignore */ }
+                            }
                             if (lead) { setSelectedLead(lead); setActiveTab("leads"); }
                           }}
                             className="mt-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">
