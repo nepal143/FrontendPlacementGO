@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { useAutoApply } from "../../hooks/useAutoApply";
@@ -260,7 +260,7 @@ function ConfigPanel({ config, onSave, saving }: {
   onSave: (c: Partial<AutoApplyConfig>) => void;
   saving: boolean;
 }) {
-  const [form, setForm] = useState<Partial<AutoApplyConfig>>(config ?? {
+  const [form, setForm] = useState<Partial<AutoApplyConfig>>({
     targetJobTitles: [],
     preferredLocations: [],
     blacklistedCompanies: [],
@@ -269,9 +269,14 @@ function ConfigPanel({ config, onSave, saving }: {
     emailApplyEnabled: true,
     maxApplicationsPerDay: 20,
     minAiMatchScore: 60,
+    ...config,
   });
   const [titleInput, setTitleInput] = useState("");
   const [locationInput, setLocationInput] = useState("");
+
+  useEffect(() => {
+    if (config) setForm(c => ({ ...c, ...config }));
+  }, [config]);
 
   function addTitle() {
     const v = titleInput.trim();
