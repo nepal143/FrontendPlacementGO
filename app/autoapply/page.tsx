@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { useAutoApply } from "../../hooks/useAutoApply";
+import { useResumes } from "../../hooks/useResume";
 import type { JobLeadDto, AutoApplyConfig, ApplicationTemplate } from "../../types/autoapply.types";
+import type { ResumeSummary } from "../../types/resume.types";
 import { getJobLead } from "../../services/autoapply.service";
 import UpgradeModal, { useSubscription } from "../component/UpgradeModal";
 
@@ -272,10 +274,11 @@ function LeadCard({ lead, onApply, onSkip, onOpen, onRegenTemplate }:
 
 // ── Config Panel ──────────────────────────────────────────────────────────────
 
-function ConfigPanel({ config, onSave, saving }: {
+function ConfigPanel({ config, onSave, saving, resumes }: {
   config: AutoApplyConfig | null;
   onSave: (c: Partial<AutoApplyConfig>) => void;
   saving: boolean;
+  resumes: ResumeSummary[];
 }) {
   const [form, setForm] = useState<Partial<AutoApplyConfig>>({
     targetJobTitles: [],
@@ -411,6 +414,48 @@ function ConfigPanel({ config, onSave, saving }: {
           onChange={v => setForm(f => ({ ...f, emailApplyEnabled: v }))} />
       </div>
 
+      {/* Active Resume Picker */}
+      <div>
+        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+          Active Resume for Job Search
+        </label>
+        {resumes.length === 0 ? (
+          <div className="mt-2 flex items-center gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl px-4 py-3">
+            <span className="text-amber-500 text-lg">⚠️</span>
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-amber-800 dark:text-amber-400">No resume uploaded yet</p>
+              <p className="text-xs text-amber-700 dark:text-amber-500 mt-0.5">
+                AI won&apos;t be able to personalise applications without your resume.
+              </p>
+            </div>
+            <a href="/resumeoptimizer"
+              className="shrink-0 text-xs bg-amber-500 text-white px-3 py-1.5 rounded-lg hover:bg-amber-600 transition font-semibold">
+              Upload Now
+            </a>
+          </div>
+        ) : (
+          <>
+            <select
+              value={form.resumeId ?? ""}
+              onChange={e => setForm(f => ({ ...f, resumeId: e.target.value || undefined }))}
+              className="mt-1.5 w-full text-sm px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">— Latest resume (auto) —</option>
+              {resumes.map(r => (
+                <option key={r.id} value={r.id}>
+                  {r.originalFileName}
+                  {r.templateName ? ` · ${r.templateName}` : ""}
+                  {" · "}{new Date(r.createdAt).toLocaleDateString()}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+              Choose which resume the AI uses when generating cover letters and scoring matches.
+              <a href="/resumeoptimizer" className="ml-1.5 text-blue-500 hover:underline">+ Add another resume</a>
+            </p>
+          </>
+        )}
+      </div>
+
       <button onClick={() => onSave(form)} disabled={saving}
         className="w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-700 transition disabled:opacity-50">
         {saving ? "Saving…" : "Save Preferences"}
@@ -447,6 +492,8 @@ export default function AutoApplyPage() {
     page, reload,
   } = useAutoApply();
 
+  const { resumes } = useResumes();
+
   const [activeTab, setActiveTab] = useState<"leads" | "config" | "notifications">("leads");
   const [selectedLead, setSelectedLead] = useState<JobLeadDto | null>(null);
   const [showNotifs, setShowNotifs] = useState(false);
@@ -459,6 +506,7 @@ export default function AutoApplyPage() {
   }
 
   const leads = leadsPage?.content ?? [];
+  const hasResume = resumes.length > 0;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -525,6 +573,23 @@ export default function AutoApplyPage() {
               <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
             </svg>
             <span>Scanning for job matches… New leads will appear automatically as they&apos;re found.</span>
+          </div>
+        )}
+
+        {/* No-resume guard banner */}
+        {!hasResume && (
+          <div className="mb-4 flex items-center gap-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-2xl px-5 py-4">
+            <span className="text-2xl shrink-0">📄</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-slate-800 dark:text-white">Upload your resume first</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                The AI needs your resume to score job matches, write personalised cover letters, and auto-fill application forms.
+              </p>
+            </div>
+            <a href="/resumeoptimizer"
+              className="shrink-0 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition whitespace-nowrap">
+              Upload Resume →
+            </a>
           </div>
         )}
 
@@ -622,7 +687,7 @@ export default function AutoApplyPage() {
         {/* ── Config tab ─────────────────────────────────────────────────────── */}
         {activeTab === "config" && (
           <div className="max-w-xl">
-            <ConfigPanel config={config} onSave={updateConfig} saving={savingConfig} />
+            <ConfigPanel config={config} onSave={updateConfig} saving={savingConfig} resumes={resumes} />
 
             {/* API key guidance */}
             <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">

@@ -881,7 +881,10 @@ export default function Dashboard() {
         <div style={{ marginTop: 32 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <span style={{ fontSize: 15, fontWeight: 700 }}>My Optimized Resumes</span>
-            <Link href="/resumeoptimizer" style={{ fontSize: 13, color: "#3b5bdb", fontWeight: 600, textDecoration: "none" }}>+ Generate new</Link>
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <Link href="/resume" style={{ fontSize: 13, color: "#2f9e44", fontWeight: 600, textDecoration: "none", background: "#ebfbee", padding: "4px 10px", borderRadius: 8 }}>+ Upload resume</Link>
+              <Link href="/resumeoptimizer" style={{ fontSize: 13, color: "#3b5bdb", fontWeight: 600, textDecoration: "none" }}>+ Generate new</Link>
+            </div>
           </div>
 
           {resumesLoading ? (
