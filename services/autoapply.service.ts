@@ -98,5 +98,6 @@ export function subscribeToNotifications(onEvent: (event: MessageEvent) => void)
   source.addEventListener("MANUAL_REQUIRED", onEvent);
   source.addEventListener("APPLY_FAILED", onEvent);
   source.addEventListener("DAILY_SUMMARY", onEvent);
+  source.addEventListener("SCAN_COMPLETE", onEvent);
   return () => source.close();
 }

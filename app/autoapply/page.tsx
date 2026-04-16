@@ -667,6 +667,7 @@ export default function AutoApplyPage() {
                     MANUAL_REQUIRED: "📋",
                     APPLY_FAILED: "❌",
                     DAILY_SUMMARY: "📊",
+                    SCAN_COMPLETE: "✅",
                   };
                   const meta = n.metadata ? (() => {
                     try { return JSON.parse(n.metadata!); } catch { return {}; }

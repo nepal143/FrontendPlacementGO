@@ -83,9 +83,11 @@ export function useAutoApply() {
           getAutoApplyStats().then(setStats).catch(() => {});
           getJobLeads(0).then(setLeadsPage).catch(() => {});
         }
-        // JOB_FOUND = scan complete
-        if (data.type === "JOB_FOUND") {
+        // SCAN_COMPLETE = definitive end of scan — clear banner & do final reload
+        if (data.type === "SCAN_COMPLETE" || data.type === "JOB_FOUND") {
           setScanPending(false);
+          getAutoApplyStats().then(setStats).catch(() => {});
+          getJobLeads(0).then(setLeadsPage).catch(() => {});
         }
       } catch {
         // ignore malformed events
@@ -93,6 +95,23 @@ export function useAutoApply() {
     });
     return cleanup;
   }, []);
+
+  // ── Polling fallback while scan is in progress ────────────────────────────
+  // If SSE drops or SCAN_COMPLETE never fires, we still show fresh leads.
+  useEffect(() => {
+    if (!scanPending) return;
+    // Poll every 30 s so leads appear even when SSE is unavailable
+    const interval = setInterval(() => {
+      getAutoApplyStats().then(setStats).catch(() => {});
+      getJobLeads(0).then(setLeadsPage).catch(() => {});
+    }, 30_000);
+    // Safety valve: auto-clear after 15 minutes to prevent a stuck spinner
+    const timeout = setTimeout(() => setScanPending(false), 15 * 60 * 1000);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [scanPending]);
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
